@@ -25,9 +25,6 @@ public class Room {
    public void addAdjacent(Room room){
       this.adjacentRooms.add(room);
    }
-   public void removeAdjacent(Room room) {
-	   this.adjacentRooms.remove(room);
-   }
    public ArrayList<Room> getAdjacent(){
       return this.adjacentRooms;
    }
