@@ -37,81 +37,77 @@ public class XMLParser{
    }
    
    //returned room[] will always be size 12 because the board always has 12 rooms.
-   public Room[] readRooms(Document d){
+   public void readRooms(Document d, Board b){
       Element root = d.getDocumentElement();
 
       NodeList sets = root.getElementsByTagName("set");
       
-      Room[] rooms = new Room[12];
-      
-      //reallistically this should be passed in instead of constructed here. IDK ill figure it out later
-      Board b = new Board();
-      
       //fills the first 10 slots of rooms with the Sets. Also adds all sets to the board.    
-      rooms = parseSets(rooms, sets, b);
+      parseSets(sets, b);
       
       NodeList trailerNodeList = root.getElementsByTagName("trailer");
-      Room room = parseTrailer(trailerNodeList, b);
-      //assigned to the 11th slot since the first 10 are full
-      rooms[10] = room;
+      parseTrailer(trailerNodeList, b);
       
       NodeList officeNodeList = root.getElementsByTagName("office");
-      room = parseOffice(officeNodeList, b);
-      //assigned to the 12th slots since the first 11 are full
-      rooms[11] = room;
-      
-      
-      return rooms;
+      parseOffice(officeNodeList, b);
+
    }
    
-   public Room[] parseSets(Room[] rooms, NodeList sets, Board b){
+   public void parseSets(NodeList sets, Board b){
       
       
       //itterates through each of the rooms in the XML file, creating a Room object for each. 
       for ( int i=0; i<sets.getLength(); i++ ){
          Node setNode = sets.item(i);
          
-         
-         // extracts the name of the node from xml file
          String name = setNode.getAttributes().getNamedItem("name").getNodeValue();
          
-         
          Set set = new Set(name, b);
-         b.putRoom(set);
+         b.putRoom(set.getName(), set);
          
          String[] neighbors = parseNeighbors(setNode);
          
          
          for (String neighbor: neighbors){
-            b.addEdge(set.name, neighbor);
+            b.addEdge(set, neighbor);
          }
-
-         rooms[i] = set;
       }
       
-      return rooms;
+      return;
       
    
    }
    
-   public Room parseTrailer(NodeList trailerNodeList, Board b){
+   public void parseTrailer(NodeList trailerNodeList, Board b){
       Node trailerNode = trailerNodeList.item(0);
-      String name = "trailer";
-      Room room = new Room(name, b);
+      String name = "Trailer";
+      Room trailer = new Room(name, b);
+      b.putRoom(trailer.getName(), trailer);
+      b.setTrailer(trailer);
       
-      //needs adjacency
+      String[] neighbors = parseNeighbors(trailerNode);
       
-      return room;
+      for (String neighbor: neighbors){
+         b.addEdge(trailer, neighbor);
+      }
+
    }
    
-   public Room parseOffice(NodeList officeNodeList, Board b){
+   public void parseOffice(NodeList officeNodeList, Board b){
       Node officeNode = officeNodeList.item(0);
       String name = "office";
-      Room room = new Room(name, b);
+      Office office = new Office(name, b);
       
-      //needs adjacency
+      b.putRoom(office.getName(), office);
       
-      return room;
+      String[] neighbors = parseNeighbors(officeNode);
+      
+      for (String neighbor: neighbors){
+         b.addEdge(office, neighbor);
+      }
+
+      
+
       
    }
    
@@ -133,10 +129,6 @@ public class XMLParser{
       
       String[] neighborNames = getNeighborNames(neighbors);
       //getNeighborNames extracts the name attributes from the neighbor nodes
-      
-      for(String name: neighborNames){
-         System.out.println(name);
-      }
       
       return neighborNames;
    }
@@ -187,10 +179,15 @@ public class XMLParser{
    //for testing only, shouldnt need to be run as main
    public static void main(String[] args){
       XMLParser p = new XMLParser();
+      Board b = new Board();
       String filename = "board.xml";
       try{
          Document d = p.getDocFromFile(filename);
-         p.readRooms(d);
+         p.readRooms(d, b);
+         Room jail = b.getRoom("General Store");
+         for (Room room : jail.getAdjacent()){
+            System.out.println(room.getName());
+         }
       } catch(Exception e) {
          System.out.println(":c");
          e.printStackTrace();

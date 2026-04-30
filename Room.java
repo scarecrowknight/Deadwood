@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Room {
 
-   public String name;
+   private String name;
    private ArrayList<Room> adjacentRooms;
    //private Card sceneCard 
    
@@ -10,7 +10,7 @@ public class Room {
       this.name = name;
       ArrayList<Room> adj = new ArrayList<Room>();
       this.adjacentRooms = adj; 
-      
+
    }
    
    // alt constructor for if you know adj rooms already
@@ -27,6 +27,9 @@ public class Room {
    }
    public ArrayList<Room> getAdjacent(){
       return this.adjacentRooms;
+   }
+   public String getName(){
+      return this.name;
    }
    
 
