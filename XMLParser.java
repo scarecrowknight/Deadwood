@@ -46,12 +46,10 @@ public class XMLParser{
       parseSets(sets, b);
       
       NodeList trailerNodeList = root.getElementsByTagName("trailer");
-      Room room = parseTrailer(trailerNodeList, b);
-      b.putRoom(room.getName(), room);
+      parseTrailer(trailerNodeList, b);
       
       NodeList officeNodeList = root.getElementsByTagName("office");
-      room = parseOffice(officeNodeList, b);
-      b.putRoom( room.getName(), room);
+      parseOffice(officeNodeList, b);
 
    }
    
@@ -80,25 +78,36 @@ public class XMLParser{
    
    }
    
-   public Room parseTrailer(NodeList trailerNodeList, Board b){
+   public void parseTrailer(NodeList trailerNodeList, Board b){
       Node trailerNode = trailerNodeList.item(0);
-      String name = "trailer";
-      Room room = new Room(name, b);
-      b.setTrailer(room);
+      String name = "Trailer";
+      Room trailer = new Room(name, b);
+      b.putRoom(trailer.getName(), trailer);
+      b.setTrailer(trailer);
       
-      //needs adjacency
+      String[] neighbors = parseNeighbors(trailerNode);
       
-      return room;
+      for (String neighbor: neighbors){
+         b.addEdge(trailer, neighbor);
+      }
+
    }
    
-   public Room parseOffice(NodeList officeNodeList, Board b){
+   public void parseOffice(NodeList officeNodeList, Board b){
       Node officeNode = officeNodeList.item(0);
       String name = "office";
-      Room room = new Room(name, b);
+      Office office = new Office(name, b);
       
-      //needs adjacency
+      b.putRoom(office.getName(), office);
       
-      return room;
+      String[] neighbors = parseNeighbors(officeNode);
+      
+      for (String neighbor: neighbors){
+         b.addEdge(office, neighbor);
+      }
+
+      
+
       
    }
    
@@ -175,8 +184,10 @@ public class XMLParser{
       try{
          Document d = p.getDocFromFile(filename);
          p.readRooms(d, b);
-         Room jail = b.getRoom("Jail");
-         System.out.println(jail.getAdjacent());
+         Room jail = b.getRoom("General Store");
+         for (Room room : jail.getAdjacent()){
+            System.out.println(room.getName());
+         }
       } catch(Exception e) {
          System.out.println(":c");
          e.printStackTrace();
