@@ -7,6 +7,7 @@ public class role {
     private boolean staringRoll;
 
     //private boolean reward type? or maybe private enum reward type with starting + extra? idk if reward increase is static, check later
+    //edit to last idea, unsure if reward type/amount should even be handled here or if we should deal with somewhere else since it really isnt a part of the role as much as the room/location and what else is going on (i.e. where players are and what rolls they have)
 
 
 	public role(String name, String quote, int rank, boolean occupied, boolean staringRoll){
