@@ -10,7 +10,7 @@ public class card{
 	private List<Integer> partLevels = new ArrayList<>();
 	private List<String> partLines = new ArrayList<>();
 	
-	public Card(String cardName, String sceneDescription, List<String> partNames, List<String> partLines, List<Integer> partLevels) {	
+	public card(String cardName, String sceneDescription, List<String> partNames, List<String> partLines, List<Integer> partLevels) {	
 		this.cardName = cardName;
 		this.sceneDescription = sceneDescription;
 		this.partNames = partNames;
