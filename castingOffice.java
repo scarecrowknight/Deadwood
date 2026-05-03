@@ -4,7 +4,7 @@ public class castingOffice extends Room {
 	private int playerDollars;
 	private int desiredRank;
 	private int playerRank;
-	int[][] RankUpgradeCost = {
+	int[][] rankUpgradeCost = {
 		{4, 5}, // dollar/credit rank 2
 		{10, 10},
 		{18, 15},
