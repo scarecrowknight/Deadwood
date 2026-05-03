@@ -14,23 +14,11 @@ public class sceneDeck{
 		Collections.shuffle(deck);
 	}
 	
-	public Card drawCaard() {
+	public Card drawCard() {
 		if (deck.isEmpty()) {
 			System.out.print("The deck is empty.");
 			return null;
 		}
 		return deck.remove(0);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
