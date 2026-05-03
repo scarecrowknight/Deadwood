@@ -28,7 +28,7 @@ public class castingOffice extends Room {
 		return rankUpgradeCost = [desiredRank - 2][1];
 	}
 	
-	public int isValidUpgrade(int desiredRank, int playerRank) {
+	public boolean isValidUpgrade(int desiredRank, int playerRank) {
 		return desiredRank > playerRank;
 	}
 	
