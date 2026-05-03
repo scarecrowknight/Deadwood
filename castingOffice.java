@@ -21,11 +21,11 @@ public class castingOffice extends Room {
 	}
 	
 	public int dollarCost() {
-		return rankUpgradeCost[desiredRank - 2][0];
+		return rankUpgradeCost = [desiredRank - 2][0];
 	}
 	
 	public int creditCost() {
-		return rankUpgradeCost[desiredRank - 2][1];
+		return rankUpgradeCost = [desiredRank - 2][1];
 	}
 	
 	public int isValidUpgrade(int desiredRank, int playerRank) {
