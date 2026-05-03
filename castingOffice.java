@@ -4,7 +4,7 @@ public class castingOffice extends Room {
 	private int playerDollars;
 	private int desiredRank;
 	private int playerRank;
-	int[][] RankUpgradeCost = {
+	int[][] rankUpgradeCost = {
 		{4, 5}, // dollar/credit rank 2
 		{10, 10},
 		{18, 15},
@@ -20,12 +20,14 @@ public class castingOffice extends Room {
 
 	}
 	
-	public int dollarCost() {
-		return rankUpgradeCost = [desiredRank - 2][0];
+	public int dollarCost(int desiredRank) {
+		this.desiredRank = desiredRank;
+		return rankUpgradeCost[desiredRank - 2][0];
 	}
 	
-	public int creditCost() {
-		return rankUpgradeCost = [desiredRank - 2][1];
+	public int creditCost(int desiredRank) {
+		this.desiredRank = desiredRank;
+		return rankUpgradeCost[desiredRank - 2][1];
 	}
 	
 	public boolean isValidUpgrade(int desiredRank, int playerRank) {
