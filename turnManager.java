@@ -2,11 +2,12 @@ import java.util.*;
 
 public class turnManager{
     private List<player> players = new ArrayList<>();
+    private view view = new view();
 
     public void addPlayers(){
        
         //List<String> playerNames = ui.getPlayerNames();
-        List<String> playerNames = null; //placeholder
+        List<String> playerNames = view.getPlayerNames(); //placeholder
 
 
         for (int i = 0; i < playerNames.size(); i++){
