@@ -1,5 +1,5 @@
 import java.util.*;
-public class Set extends Room{
+public class Set extends Room {
 
 	public String sceneName;
 	public int shotCount; // xml calls these takes
@@ -9,7 +9,8 @@ public class Set extends Room{
 	public ArrayList<String> lines; 
 	public int maxRoles;
 	
-   public Set(String sceneName, int shotCount, int currentPlayers, ArrayList<String> lines) {
+   public Set(String sceneName,String name, Board board, int shotCount, int currentPlayers, ArrayList<String> lines) {
+	   super(name, board);
 	   this.sceneName = sceneName;
 	   this.shotCount = shotCount;
 	   this.currentPlayers = currentPlayers;

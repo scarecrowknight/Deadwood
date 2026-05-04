@@ -6,8 +6,8 @@ public class player{
     private String name = "Player";
     private int score = 0;
     private int practiceChips = 0;
-    //private location location = Trailer; /* commented out until location class is implemented */ //auto set to trailer as that is starting location no matter what
-
+    private Room location; 
+    
     public player(int userNumber, int turnOrder, role role, int money, String name, int score, int practiceChips) {
         this.userNumber = userNumber;
         this.turnOrder = turnOrder;
@@ -20,6 +20,12 @@ public class player{
         this.practiceChips = practiceChips;
     }
 
+    public Room currentLocation() {
+    	return location;
+    }
+    public void SetLocation(Room location) {
+    	this.location = location;
+    }
      public String getName() {
         return name;
     }
