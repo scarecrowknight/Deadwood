@@ -16,7 +16,6 @@ import java.util.*;
 
 public class XMLParser{
    
-   
    public Document getDocFromFile(String filename)
    throws ParserConfigurationException{
      {
@@ -96,8 +95,8 @@ public class XMLParser{
    public void parseOffice(NodeList officeNodeList, Board b){
       Node officeNode = officeNodeList.item(0);
       String name = "office";
-      Office office = new Office(name, b);
-      
+      castingOffice office = new castingOffice(name, b);
+  
       b.putRoom(office.getName(), office);
       
       String[] neighbors = parseNeighbors(officeNode);

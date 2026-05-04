@@ -18,6 +18,9 @@ public class castingOffice extends Room {
 		this.playerRank =  playerRank;
 
 	}
+	public castingOffice(String name, Board b) {
+		super(name, b);
+	}
 	
 	public int dollarCost(int desiredRank) {
 		this.desiredRank = desiredRank;
