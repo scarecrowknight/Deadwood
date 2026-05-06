@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class turnManager{
-    private List<player> players = new ArrayList<>();
+    private List<Player> players = new ArrayList<>();
     private view view = new view();
 
     public void addPlayers(){
@@ -12,7 +12,7 @@ public class turnManager{
 
         for (int i = 0; i < playerNames.size(); i++){
             String name = playerNames.get(i);
-            players.add(new player(i,i, null, 0, name, 0, 0));
+            players.add(new Player(i,i, null, 0, name, 0, 0));
         }
     }
     public void randomizeTurnOrder(){
@@ -25,7 +25,7 @@ public class turnManager{
         // Pick an action player
             // Ask the player to pick an action
             //String action = ui.askplayerAction(players.get(i));
-            String action = "ooga booga"; //placeholder
+            String action = "placeholder"; //placeholder
             if (action == "move"){
                 // Handle the move action
             } else if (action == "act"){
