@@ -1,4 +1,4 @@
-public class player{
+public class Player{
 	private int userNumber = 0;
     private int turnOrder = 0;
     private role role = null;
@@ -8,7 +8,7 @@ public class player{
     private int practiceChips = 0;
     private Room location; 
     
-    public player(int userNumber, int turnOrder, role role, int money, String name, int score, int practiceChips) {
+    public Player(int userNumber, int turnOrder, role role, int money, String name, int score, int practiceChips) {
         this.userNumber = userNumber;
         this.turnOrder = turnOrder;
         this.name = name;
