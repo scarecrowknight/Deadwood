@@ -3,6 +3,9 @@ import java.util.*;
 public class turnManager{
     private List<Player> players = new ArrayList<>();
     private view view = new view();
+    private int days = 4;
+    private int currentDay = 1;
+
 
     public void addPlayers(){
        
@@ -10,11 +13,30 @@ public class turnManager{
         List<String> playerNames = view.getPlayerNames(); //placeholder
 
 
+        
+        int numPlayers = players.size();
+        int startCredits = 0;
+        int startRank = 1;
+        
+        if (numPlayers <= 3){
+            this.days = 3;
+        } // If there are 4 or more players, use the default 4 days
+        else if (numPlayers == 5){
+            startCredits = 2;
+        } else if (numPlayers == 6){
+            startCredits = 4;
+        } else if (numPlayers >= 7){
+            startRank = 2;
+        }
+
         for (int i = 0; i < playerNames.size(); i++){
             String name = playerNames.get(i);
-            players.add(new Player(i,i, null, 0, name, 0, 0));
+            //public Player(int userNumber, int turnOrder, role role, int money,int credits, int rank, String name, int practiceChips) {
+            players.add(new Player(i,i, null, 0, startCredits, startRank, name, 0));
         }
     }
+
+
     public void randomizeTurnOrder(){
         Collections.shuffle(players);
         for (int i = 0; i < players.size(); i++){

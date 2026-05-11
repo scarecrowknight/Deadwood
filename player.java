@@ -3,20 +3,21 @@ public class Player{
     private int turnOrder = 0;
     private role role = null;
     private int money = 0;
+    private int credits = 0;
+    private int rank = 1;
     private String name = "Player";
-    private int score = 0;
     private int practiceChips = 0;
     private Room location; 
     
-    public Player(int userNumber, int turnOrder, role role, int money, String name, int score, int practiceChips) {
+    public Player(int userNumber, int turnOrder, role role, int money,int credits, int rank, String name, int practiceChips) {
         this.userNumber = userNumber;
         this.turnOrder = turnOrder;
         this.name = name;
 
         this.role = role;
         this.money = money;
-        
-        this.score = score;
+        this.credits = credits;
+        this.rank = rank;
         this.practiceChips = practiceChips;
     }
 
@@ -57,11 +58,18 @@ public class Player{
         this.money = money;
     }
 
-    public int getScore() {
-        return score;
+    public int getCredits() {
+        return credits;
     }
-    public void setScore(int score) {
-        this.score = score;
+    public void setCredits(int credits) {
+        this.credits = credits;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
 
