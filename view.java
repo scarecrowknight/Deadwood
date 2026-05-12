@@ -34,6 +34,12 @@ public List<String> getPlayerNames(){
     }
     return names;
 }
-
-
+public void render(Packet packet) {
+    // Implementation for rendering a packet
+}
+public String renderAndRequestAction(Packet packet) {
+    render(packet);
+    System.out.print("> ");
+    return scanner.nextLine();
+}
 }

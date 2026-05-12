@@ -1,5 +1,5 @@
 import java.util.List;
-
+/// packet is an OBD object that carries data between the logic layer (primarily turn manager) and the view layer. Later it will be used to carry data to UI/Visualization layerws
 public class Packet{
     //defines exactly what semantic event just occurred in the logic layer
     public enum EventType {
@@ -22,7 +22,9 @@ public class Packet{
         REHEARSAL_MAXED,
         // Upgrade Phase Events
         UPGRADED,
-        INVALID_ACTION
+        INVALID_ACTION,
+        QUERY_UPGRADE_RANK,
+        QUERY_UPGRADE_PAYMENT,
     }
 
     //game info 
@@ -44,6 +46,16 @@ public class Packet{
     private boolean sceneWrapped; // Did the scene finish?
     private String denialReason;  // Why they were denied a role
 
+    //upgrade phase varibles 
+    private List<Integer> affordableRanks;
+    private List<Integer> unaffordableRanks;
+    private int targetRankUpgrade;
+    private int dollarCost;
+    private int creditCost;
+    private boolean canPayDollars;
+    private boolean canPayCredits;
+
+    //core builder
     public Packet(Player player, Room location, Board board, List<String> availableActions, EventType lastEvent) {
         this.player = player;
         this.location = location;
@@ -51,20 +63,23 @@ public class Packet{
         this.availableActions = availableActions;
         this.lastEvent = lastEvent;
     }
-
+    //basic getters
     public Player getPlayer() { return player; }
     public Room getLocation() { return location; }
     public Board getBoard() { return board; }
     public List<String> getAvailableActions() { return availableActions; }
     public EventType getLastEvent() { return lastEvent; }
 
+    //move data builder
     public void setMoveData(Room targetLocation, card currentCard) {
         this.targetLocation = targetLocation;
         this.currentCard = currentCard;
     }
+    //move getters
     public Room getTargetLocation() { return targetLocation; }
     public card getCurrentCard() { return currentCard; }
 
+    // role data builder
     public void setRoleData(role targetRole) {
         this.targetRole = targetRole;
     }
@@ -73,13 +88,15 @@ public class Packet{
     }
     public List<role> getAvailableRoles() { return availableRoles; }
 
+    //role outcome builder
     public void setRoleOutcomeData(role targetRole, String denialReason) {
         this.targetRole = targetRole;
         this.denialReason = denialReason;
     }
     public role getTargetRole() {return targetRole; }
     public String getDenialReason() { return denialReason; }
-
+   
+    //act builder
     public void setActData(int rawRoll, int moneyChange, int creditChange, boolean sceneWrapped) {
         this.rawRoll = rawRoll;
         this.moneyChange = moneyChange;
@@ -97,5 +114,27 @@ public class Packet{
         this.creditChange = creditChange;
     }
     public int getRankChange() { return rankChange; }
+
+    //upgrade packket builder
+    public void setUpgradeQueryRankData(List<Integer> affordableRanks, List<Integer> unaffordableRanks) {
+        this.affordableRanks = affordableRanks;
+        this.unaffordableRanks = unaffordableRanks;
+    }
+    public List<Integer> getAffordableRanks() { return affordableRanks; }
+    public List<Integer> getUnaffordableRanks() { return unaffordableRanks; }
+
+    //upgrade payment type builder
+    public void setUpgradeQueryPaymentData(int targetRankUpgrade, int dollarCost, int creditCost, boolean canPayDollars, boolean canPayCredits) {
+        this.targetRankUpgrade = targetRankUpgrade;
+        this.dollarCost = dollarCost;
+        this.creditCost = creditCost;
+        this.canPayDollars = canPayDollars;
+        this.canPayCredits = canPayCredits;
+    }
+    public int getTargetRankUpgrade() { return targetRankUpgrade; }
+    public int getDollarCost() { return dollarCost; }
+    public int getCreditCost() { return creditCost; }
+    public boolean canPayDollars() { return canPayDollars; }
+    public boolean canPayCredits() { return canPayCredits; }
 }
 
