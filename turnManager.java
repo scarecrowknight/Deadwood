@@ -6,7 +6,15 @@ public class turnManager{
     private int days = 4;
     private int currentDay = 1;
 
-
+    public int totalPlayers() {
+    	return players.size(); 
+    }
+    public int daysLeft() {
+    	if (players.size() <= 3){
+            this.days = 3;
+    }
+    	return days - currentDay;
+    }
     public void addPlayers(){
        
         //List<String> playerNames = ui.getPlayerNames();

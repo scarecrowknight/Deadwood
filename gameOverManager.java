@@ -1,15 +1,14 @@
 public class gameOverManager{
 	
-	public boolean isGameOver(int day, int playerCount) {
-		if (playerCount < 4) {
-			return day > 3;
+	public boolean isGameOver() {
+		turnManager turnManager = new turnManager();
+		if (turnManager.daysLeft() <= 0)  {
+			return true;
 		}
-		return day > 4;
+		return false;
 	}
 	
 	public void endGame(int day, int playerCount) {
-		if (isGameOver(day, playerCount)) {
-			System.out.println("THE GAME IS OVER"); // needs real end game logic
-		}
-	}
-}
+			System.out.println("THE GAME IS OVER");
+			System.exit(0);
+}}
