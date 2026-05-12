@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class turnManager{
+public class main{
     private List<Player> players = new ArrayList<>();
     private view view = new view();
     private Board board;
@@ -80,7 +80,7 @@ public class turnManager{
                 }
             }
             availableActions.add("End Turn");
-
+            
             // 2. Request Choice via DTO Request
             Packet request = new Packet(currentPlayer, loc, board, availableActions, null);
             String action = view.renderAndRequestAction(request).toLowerCase().trim();
@@ -199,5 +199,8 @@ public class turnManager{
             upgrade(player);
         }
     }
+    public void endGame() {
+		System.exit(0); // needs real logic
+}
 }
 	
