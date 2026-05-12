@@ -4,11 +4,23 @@ public class Packet{
     //defines exactly what semantic event just occurred in the logic layer
     public enum EventType {
         TURN_START,
+        // Move Phase Events
+        QUERY_MOVE,
+        QUERY_DESTINATION,
         MOVED,
+        SCENE_REVEALED,
+        // Role / Audition Phase Events
+        QUERY_TAKE_ROLE,
+        CHOOSE_ROLE,
         TOOK_ROLE,
+        ROLE_DENIED,
+        // Work Phase Events
+        QUERY_WORK,
         ACT_SUCCESS,
         ACT_FAIL,
         REHEARSED,
+        REHEARSAL_MAXED,
+        // Upgrade Phase Events
         UPGRADED,
         INVALID_ACTION
     }
@@ -21,13 +33,16 @@ public class Packet{
     private EventType lastEvent;
     
     // context fields depending on the event type
-    private Room targetLocation; // Where they moved to
-    private role targetRole;     // What role they took
-    private int rawRoll;         // The raw die roll
+    private Room targetLocation;// Where they moved to
+    private card currentCard;
+    private List<role> availableRoles; //current available roles at the location
+    private role targetRole;     // role they took
+    private int rawRoll;         // raw die roll
     private int moneyChange;     // Deltas for currencies
     private int creditChange;
     private int rankChange;
     private boolean sceneWrapped; // Did the scene finish?
+    private String denialReason;  // Why they were denied a role
 
     public Packet(Player player, Room location, Board board, List<String> availableActions, EventType lastEvent) {
         this.player = player;
@@ -43,15 +58,27 @@ public class Packet{
     public List<String> getAvailableActions() { return availableActions; }
     public EventType getLastEvent() { return lastEvent; }
 
-    public void setMoveData(Room targetLocation) {
+    public void setMoveData(Room targetLocation, card currentCard) {
         this.targetLocation = targetLocation;
+        this.currentCard = currentCard;
     }
     public Room getTargetLocation() { return targetLocation; }
+    public card getCurrentCard() { return currentCard; }
 
     public void setRoleData(role targetRole) {
         this.targetRole = targetRole;
     }
-    public role getTargetRole() { return targetRole; }
+    public void setAvailableRoles(List<role> availableRoles) {
+        this.availableRoles = availableRoles;
+    }
+    public List<role> getAvailableRoles() { return availableRoles; }
+
+    public void setRoleOutcomeData(role targetRole, String denialReason) {
+        this.targetRole = targetRole;
+        this.denialReason = denialReason;
+    }
+    public role getTargetRole() {return targetRole; }
+    public String getDenialReason() { return denialReason; }
 
     public void setActData(int rawRoll, int moneyChange, int creditChange, boolean sceneWrapped) {
         this.rawRoll = rawRoll;
@@ -71,3 +98,4 @@ public class Packet{
     }
     public int getRankChange() { return rankChange; }
 }
+
