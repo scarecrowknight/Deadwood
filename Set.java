@@ -9,7 +9,7 @@ public class Set extends Room {
 	private List<role> roles = null;
 	private card activeCard = null;
 	
-   public Set(String name, Board board, int shotCount, int currentPlayers, card activeCard) {
+   public Set(String name, Board board, int shotCount, int currentPlayers, List<role> roles, card activeCard) {
 	   super(name, board);
 	   this.shotCount = shotCount; //contains shots to be applied by board manager
 	   this.currentPlayers = currentPlayers; //list of current players on set
@@ -37,8 +37,10 @@ public class Set extends Room {
 	   this.currentPlayers = currentPlayers;
    }
 
-   //THIS IS INCOMPLETE AND LITERALLY JUST FOR LETTING MY XML PARSER COMPILE DELETE LATER
-   public Set(String name, Board board){
-      super(name, board);
+   public List<role> getRoles() {
+	   return this.roles;
+   }
+   public void setRoles(List<role> roles) {
+	   this.roles = roles;
    }
 }
