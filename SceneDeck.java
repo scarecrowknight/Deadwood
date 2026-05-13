@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
-import javax.smartcardio.Card;
 
 public class SceneDeck{
 	private ArrayList<Card> deck;
@@ -14,7 +13,11 @@ public class SceneDeck{
 		Collections.shuffle(deck);
 	}
 	
-	public Card drawCard() {
+   public void add(Card card){
+      deck.add(card);
+   }
+   
+	public Card draw(){
 		if (deck.isEmpty()) {
 			System.out.print("The deck is empty.");
 			return null;
