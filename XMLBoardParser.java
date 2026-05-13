@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import java.io.File;
 
 import java.util.*;
+import java.util.ArrayList;
 
 
 
@@ -70,7 +71,7 @@ public class XMLBoardParser{
    public void parseOffice(NodeList officeNodeList, Board b){
       Node officeNode = officeNodeList.item(0);
       String name = "office";
-      castingOffice office = new castingOffice(name, b);
+      CastingOffice office = new CastingOffice(name, b);
   
       b.putRoom(office.getName(), office);
       
@@ -83,12 +84,9 @@ public class XMLBoardParser{
       
 
       
-   }
-
-   
+   }  
    
    public void parseSets(NodeList sets, Board b){
-      
       
       //itterates through each of the rooms in the XML file, creating a Room object for each. 
       for ( int i=0; i<sets.getLength(); i++ ){

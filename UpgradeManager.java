@@ -3,15 +3,15 @@ import java.util.List;
 
 public class UpgradeManager {
     private Board board;
-    private view view;
+    private View view;
 
-    public UpgradeManager(Board board, view view) {
+    public UpgradeManager(Board board, View view) {
         this.board = board;
         this.view = view;
     }
     //upgrade
     public void upgrade(Player player) {
-        castingOffice office = (castingOffice) player.currentLocation();
+        CastingOffice office = (CastingOffice) player.currentLocation();
         int currentRank = player.getRank();
 
         //find what ranks the player has surpassed, what they can afford viab credits and dollars, and what they canty afford
