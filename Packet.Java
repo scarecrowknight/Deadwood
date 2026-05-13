@@ -1,5 +1,6 @@
 import java.util.List;
-/// packet is an OBD object that carries data between the logic layer (primarily turn manager) and the view layer. Later it will be used to carry data to UI/Visualization layerws
+// packet is an DTO object that carries data between the logic layer (primarily turn manager) and the view layer. Later it will be used to carry data to UI/Visualization layerws
+// https://api-platform.com/docs/core/dto/
 public class Packet{
     //defines exactly what semantic event just occurred in the logic layer
     public enum EventType {
@@ -54,6 +55,9 @@ public class Packet{
     private int creditCost;
     private boolean canPayDollars;
     private boolean canPayCredits;
+
+    //move phase
+    private List<Room> adjacentRooms;
 
     //core builder
     public Packet(Player player, Room location, Board board, List<String> availableActions, EventType lastEvent) {
@@ -136,5 +140,14 @@ public class Packet{
     public int getCreditCost() { return creditCost; }
     public boolean canPayDollars() { return canPayDollars; }
     public boolean canPayCredits() { return canPayCredits; }
+
+
+    //move phase builder
+    
+    // move query builders & getters
+    public void setMoveQueryData(List<Room> adjacentRooms) {
+        this.adjacentRooms = adjacentRooms;
+    }
+    public List<Room> getAdjacentRooms() { return adjacentRooms; }
 }
 
