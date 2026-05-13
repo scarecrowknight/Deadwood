@@ -45,7 +45,6 @@ public class DeadWood {
       return this.board;
     }
     public SceneDeck getDeck(){
-    	Card card = this.deck.draw();
       return this.deck;
     }
     
@@ -62,12 +61,21 @@ public class DeadWood {
     	//(View)
     	View gameView = new View();
     	
-    	//(Controller)
+    	//(Controller) q
     	boolean playerIsReady = gameView.askStart();
     	
     	if(playerIsReady) {
     		gameView.printFullBoard(gameBoard);
     		gameView.showMessage("\nGame is starting...");
+    		
+    		GameManager gameManager = new GameManager(gameBoard, gameView);
+    		
+    		//player setup
+    		gameManager.addPlayers();
+    		gameManager.randomizeTurnOrder();
+    		
+    		//game starts
+    		gameManager.runGame();
     	} else {
     		gameView.showMessage("You're lame anyway. Goodbye! ");
     	}

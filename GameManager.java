@@ -2,11 +2,33 @@ import java.util.*;
 
 public class GameManager{
     private List<Player> players = new ArrayList<>();
-    private View view = new View();
+    private View view;
     private Board board;
     private int days = 4;
     private int currentDay = 1;
 
+    public GameManager(Board board, View view) {
+    	this.board = board;
+    	this.view = view;
+    }
+    public void runGame() {
+    	while(currentDay <= days) {
+    		view.showMessage("It's day " + currentDay);
+    		Room trailer = board.getTrailer();
+    		for (Player p : players) {
+    			p.SetLocation(trailer);
+    		}
+    		//player turns
+    		for(int i = 0; i < players.size(); i++) {
+    			pickAction(i);
+    		}
+    		//all players have gone
+    		view.showMessage("He who learns and runs away, lives to another day." );
+    		currentDay++;
+    	}
+    	view.showMessage("The game is over... time to pack it up...");
+    }
+    
     public int totalPlayers() {
     	return players.size(); 
     }
@@ -20,7 +42,7 @@ public class GameManager{
        
         //List<String> playerNames = ui.getPlayerNames();
         List<String> playerNames = view.getPlayerNames();
-        int numPlayers = players.size();
+        int numPlayers = playerNames.size();
         int startCredits = 0;
         int startRank = 1;
         

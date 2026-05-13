@@ -59,17 +59,39 @@ public List<String> getPlayerNames(){
         if (names.size() >= 2 && names.size() <= 8) {
             valid = true;
         } else {
-            System.out.println("Invalid number of players. Please enter between 1 and 8 players.");
+            System.out.println("Invalid number of players. Please enter between 2 and 8 players.");
         }
     }
     return names;
 }
 public void render(Packet packet) {
-    // Implementation for rendering a packet
+    if (packet.getLastEvent() == null) return;
+    
+    switch (packet.getLastEvent()) {
+    case TURN_START:
+    	System.out.println("Hey " + packet.getPlayer().getName() + "! You're on now!" );
+    	System.out.println("Current player: " + packet.getPlayer().getName());
+    	System.out.println("Location: " + packet.getLocation().getName());
+    	break; 	
+    case INVALID_ACTION:
+    	System.out.println("Invalid action... Don't do that again...");
+    	break;
+    case MOVED:
+    	System.out.println("Moved to:" + packet.getTargetLocation().getName());
+    	break;
+    case SCENE_REVEALED:
+    	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
+    	break;	
+    default:
+    	break;
+    }
 }
 public String renderAndRequestAction(Packet packet) {
     render(packet);
+    
+    //showing options + requesting input
+    System.out.println("What would you like to do?" + packet.getAvailableActions());
     System.out.print("> ");
-    return scanner.nextLine();
+    return this.scanner.nextLine();
 }
 }
