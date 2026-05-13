@@ -4,7 +4,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.io.File;
-
+import java.util.*;
 import java.util.ArrayList;
 
 public class DeadWood {
@@ -15,9 +15,10 @@ public class DeadWood {
     private void makeSceneDeck(){
       XMLCardParser p = new XMLCardParser();
       String filename = "cards.xml";
+      SceneDeck deck = new SceneDeck();
+      
       try{
          Document d = p.getDocFromFile(filename);
-         SceneDeck deck = new SceneDeck();
          p.readCards(d, deck);
       } catch(Exception e) {
          System.out.println(":c");
@@ -45,8 +46,9 @@ public class DeadWood {
     private Board getBoard(){
       return this.board;
     }
-    private SceneDeck getDeck(){
-      return this.deck;
+    private String getDeck(){
+    	Card card = this.deck.draw();
+      return card.toString();
     }
     
     public DeadWood(){
@@ -54,9 +56,9 @@ public class DeadWood {
       this.makeSceneDeck();
     }
     
-    public static void main(String[] args){
+    public static void main(String[] args) {
       DeadWood deadwood = new DeadWood();
-      System.outdeadwood.getDeck.draw());
+      System.out.println(deadwood.getDeck());
     }
     
 }

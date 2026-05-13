@@ -19,5 +19,9 @@ public class Card{
    public ArrayList<Role> getRoles() {
 	   return this.roles;
    }
+   
+   public String toString() {
+	   return this.name;
+   }
 
 }
