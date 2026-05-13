@@ -1,8 +1,8 @@
-public class boardManager{
+public class BoardManager{
 	private Board board;
 	private boolean dayOver;
 	
-	public boardManager(Board board) {
+	public BoardManager(Board board) {
 		this.board = board;
 	}
 	public Board getBoard() {
