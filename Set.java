@@ -6,10 +6,10 @@ public class Set extends Room {
 	private int currentPlayers = 0;
 	/*the array lines can hold the line for each role "Well, I'll be!",
 	also its size is the max number of roles for the scene */
-	private List<role> roles = null;
+	private ArrayList<role> roles = null;
 	private card activeCard = null;
 	
-   public Set(String name, Board board, int shotCount, int currentPlayers, List<role> roles, card activeCard) {
+   public Set(String name, Board board, int shotCount, int currentPlayers, ArrayList<role> roles, card activeCard) {
 	   super(name, board);
 	   this.shotCount = shotCount; //contains shots to be applied by board manager
 	   this.currentPlayers = currentPlayers; //list of current players on set
@@ -40,7 +40,7 @@ public class Set extends Room {
    public List<role> getRoles() {
 	   return this.roles;
    }
-   public void setRoles(List<role> roles) {
+   public void setRoles(ArrayList<role> roles) {
 	   this.roles = roles;
    }
 }
