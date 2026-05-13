@@ -34,8 +34,6 @@ public class DeadWood {
       try{
          Document d = p.getDocFromFile(filename);
          p.readRooms(d, b);
-         Room r = b.getRoom("Trailer");
-         System.out.println(r.getAdjacent());
       } catch(Exception e) {
          System.out.println(":c");
          e.printStackTrace();
@@ -43,12 +41,12 @@ public class DeadWood {
       this.board = b;
     }
     
-    private Board getBoard(){
+    public Board getBoard(){
       return this.board;
     }
-    private String getDeck(){
+    public SceneDeck getDeck(){
     	Card card = this.deck.draw();
-      return card.toString();
+      return this.deck;
     }
     
     public DeadWood(){
@@ -57,8 +55,23 @@ public class DeadWood {
     }
     
     public static void main(String[] args) {
-      DeadWood deadwood = new DeadWood();
-      System.out.println(deadwood.getDeck());
+        //(Model)
+    	DeadWood gameSetup = new DeadWood();
+    	Board gameBoard = gameSetup.getBoard();
+    
+    	//(View)
+    	View gameView = new View();
+    	
+    	//(Controller)
+    	boolean playerIsReady = gameView.askStart();
+    	
+    	if(playerIsReady) {
+    		gameView.printFullBoard(gameBoard);
+    		gameView.showMessage("\nGame is starting...");
+    	} else {
+    		gameView.showMessage("You're lame anyway. Goodbye! ");
+    	}
+      
     }
     
 }
