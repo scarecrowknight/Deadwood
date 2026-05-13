@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class gameManager{
+
     private List<Player> players = new ArrayList<>();
     private view view = new view();
     private Board board;
@@ -11,13 +12,9 @@ public class gameManager{
     	return players.size(); 
     }
     public int daysLeft() {
-    	if (players.size() <= 3){
-            this.days = 3;
-    }
     	return days - currentDay;
     }
     public void addPlayers(){
-       
         //List<String> playerNames = ui.getPlayerNames();
         List<String> playerNames = view.getPlayerNames();
         int numPlayers = players.size();
@@ -41,8 +38,6 @@ public class gameManager{
             players.add(new Player(i,i, null, 0, startCredits, startRank, name, 0));
         }
     }
-
-
     public void randomizeTurnOrder(){
         Collections.shuffle(players);
         for (int i = 0; i < players.size(); i++){
@@ -71,7 +66,7 @@ public class gameManager{
                     availableActions.add("Move");
                 }
                 //take a role if on an active Set
-                if (loc instanceof Set && ((Set) loc).getActiveCard() != null) {
+                if (loc instanceof Set && ((Set) loc).getActiveCard() != null) { //may neeed to add a "is flipped" to card rather than a null atribute
                     availableActions.add("Take Role");
                 }
                 //upgrade if in the casting office
@@ -87,9 +82,8 @@ public class gameManager{
 
             // 3. Route Choice
             if (action.equals("move") && !hasMoved && currentPlayer.getRole() == null) {
-                moveManager mover = new moveManager();
+                moveManager mover = new moveManager(board, view);
                 hasMoved = mover.reallyMove(currentPlayer);
-                
             } else if (action.equals("take role") && currentPlayer.getRole() == null) {
                 //boolean tookRole = takeRole(currentPlayer);
                 //if (tookRole) turnComplete = true; // Taking a role ends action phase
