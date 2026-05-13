@@ -88,7 +88,7 @@ public class GameManager{
             // 3. Route Choice
             if (action.equals("move") && !hasMoved && currentPlayer.getRole() == null) {
                 MoveManager mover = new MoveManager();
-                //hasMoved = mover.reallyMove(currentPlayer);
+                //hasMoved = mover.movePlayer(currentPlayer);
                 
             } else if (action.equals("take role") && currentPlayer.getRole() == null) {
                 //boolean tookRole = takeRole(currentPlayer);
