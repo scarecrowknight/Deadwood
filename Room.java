@@ -4,6 +4,7 @@ public class Room {
 
    private String name;
    private ArrayList<Room> adjacentRooms;
+   private ArrayList<Player> players;
    //private Card sceneCard 
    
    public Room(String name, Board board){
@@ -31,6 +32,8 @@ public class Room {
    public String getName(){
       return this.name;
    }
-   
+   public String toString() {
+	   return this.name;
+   }
 
 }

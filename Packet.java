@@ -37,9 +37,9 @@ public class Packet{
     
     // context fields depending on the event type
     private Room targetLocation;// Where they moved to
-    private card currentCard;
-    private List<role> availableRoles; //current available roles at the location
-    private role targetRole;     // role they took
+    private Card currentCard;
+    private List<Role> availableRoles; //current available roles at the location
+    private Role targetRole;     // role they took
     private int rawRoll;         // raw die roll
     private int moneyChange;     // Deltas for currencies
     private int creditChange;
@@ -75,29 +75,29 @@ public class Packet{
     public EventType getLastEvent() { return lastEvent; }
 
     //move data builder
-    public void setMoveData(Room targetLocation, card currentCard) {
+    public void setMoveData(Room targetLocation, Card currentCard) {
         this.targetLocation = targetLocation;
         this.currentCard = currentCard;
     }
     //move getters
     public Room getTargetLocation() { return targetLocation; }
-    public card getCurrentCard() { return currentCard; }
+    public Card getCurrentCard() { return currentCard; }
 
     // role data builder
-    public void setRoleData(role targetRole) {
+    public void setRoleData(Role targetRole) {
         this.targetRole = targetRole;
     }
-    public void setAvailableRoles(List<role> availableRoles) {
+    public void setAvailableRoles(List<Role> availableRoles) {
         this.availableRoles = availableRoles;
     }
-    public List<role> getAvailableRoles() { return availableRoles; }
+    public List<Role> getAvailableRoles() { return availableRoles; }
 
     //role outcome builder
-    public void setRoleOutcomeData(role targetRole, String denialReason) {
+    public void setRoleOutcomeData(Role targetRole, String denialReason) {
         this.targetRole = targetRole;
         this.denialReason = denialReason;
     }
-    public role getTargetRole() {return targetRole; }
+    public Role getTargetRole() {return targetRole; }
     public String getDenialReason() { return denialReason; }
    
     //act builder

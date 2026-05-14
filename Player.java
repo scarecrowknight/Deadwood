@@ -1,7 +1,7 @@
 public class Player{
 	private int userNumber = 0;
     private int turnOrder = 0;
-    private role role = null;
+    private Role role = null;
     private int money = 0;
     private int credits = 0;
     private int rank = 1;
@@ -9,7 +9,7 @@ public class Player{
     private int practiceChips = 0;
     private Room location; 
     
-    public Player(int userNumber, int turnOrder, role role, int money,int credits, int rank, String name, int practiceChips) {
+    public Player(int userNumber, int turnOrder, Role role, int money,int credits, int rank, String name, int practiceChips) {
         this.userNumber = userNumber;
         this.turnOrder = turnOrder;
         this.name = name;
@@ -44,10 +44,10 @@ public class Player{
         this.turnOrder = turnOrder;
     }
 
-    public role getRole() {
+    public Role getRole() {
         return role;
     }
-    public void setRole(role role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

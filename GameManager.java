@@ -1,13 +1,34 @@
 import java.util.*;
 
 public class gameManager{
-
     private List<Player> players = new ArrayList<>();
-    private view view = new view();
+    private View view;
     private Board board;
     private int days = 4;
     private int currentDay = 1;
 
+    public GameManager(Board board, View view) {
+    	this.board = board;
+    	this.view = view;
+    }
+    public void runGame() {
+    	while(currentDay <= days) {
+    		view.showMessage("It's day " + currentDay);
+    		Room trailer = board.getTrailer();
+    		for (Player p : players) {
+    			p.SetLocation(trailer);
+    		}
+    		//player turns
+    		for(int i = 0; i < players.size(); i++) {
+    			pickAction(i);
+    		}
+    		//all players have gone
+    		view.showMessage("He who learns and runs away, lives to another day." );
+    		currentDay++;
+    	}
+    	view.showMessage("The game is over... time to pack it up...");
+    }
+    
     public int totalPlayers() {
     	return players.size(); 
     }
@@ -17,7 +38,7 @@ public class gameManager{
     public void addPlayers(){
         //List<String> playerNames = ui.getPlayerNames();
         List<String> playerNames = view.getPlayerNames();
-        int numPlayers = players.size();
+        int numPlayers = playerNames.size();
         int startCredits = 0;
         int startRank = 1;
         
@@ -70,7 +91,7 @@ public class gameManager{
                     availableActions.add("Take Role");
                 }
                 //upgrade if in the casting office
-                if (loc instanceof castingOffice) {
+                if (loc instanceof CastingOffice) {
                     availableActions.add("Upgrade");
                 }
             }
@@ -82,15 +103,16 @@ public class gameManager{
 
             // 3. Route Choice
             if (action.equals("move") && !hasMoved && currentPlayer.getRole() == null) {
-                moveManager mover = new moveManager(board, view);
+                moveManager mover = new moveManager();
                 hasMoved = mover.reallyMove(currentPlayer);
+                
             } else if (action.equals("take role") && currentPlayer.getRole() == null) {
                 //boolean tookRole = takeRole(currentPlayer);
                 //if (tookRole) turnComplete = true; // Taking a role ends action phase
             } else if (action.equals("work") && currentPlayer.getRole() != null) {
                 //work(currentPlayer);
                 turnComplete = true; // Working consumes the turn
-            } else if (action.equals("upgrade") && loc instanceof castingOffice) {
+            } else if (action.equals("upgrade") && loc instanceof CastingOffice) {
                 UpgradeManager upgradeManager = new UpgradeManager(board, view);
                 upgradeManager.upgrade(currentPlayer);
             } else if (action.equals("end turn")) {

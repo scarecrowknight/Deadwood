@@ -1,4 +1,4 @@
-public class castingOffice extends Room {
+public class CastingOffice extends Room {
 	private int playerCredits;
 	private int playerDollars;
 	private int desiredRank;
@@ -10,7 +10,7 @@ public class castingOffice extends Room {
 		{28, 20},
 		{40, 25}
 };
-	public castingOffice(String name, Board board, int playerRank, int playerCredits, int playerDollars, int desiredRank) {
+	public CastingOffice(String name, Board board, int playerRank, int playerCredits, int playerDollars, int desiredRank) {
 		super(name, board);
 		this.playerCredits = playerCredits;
 		this.playerDollars = playerDollars;
@@ -18,7 +18,7 @@ public class castingOffice extends Room {
 		this.playerRank =  playerRank;
 
 	}
-	public castingOffice(String name, Board b) {
+	public CastingOffice(String name, Board b) {
 		super(name, b);
 	}
 	
