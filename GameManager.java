@@ -1,26 +1,56 @@
 import java.util.*;
 
-public class gameManager{
+public class GameManager{
     private List<Player> players = new ArrayList<>();
     private View view;
     private Board board;
     private int days = 4;
     private int currentDay = 1;
-
-    public GameManager(Board board, View view) {
+    private SceneDeck sceneDeck = new SceneDeck();
+    
+	public GameManager(Board board, View view) {
     	this.board = board;
     	this.view = view;
     }
+	public void initializeDeck(List<Card> parsedCards) {
+		for (Card c : parsedCards) {
+			sceneDeck.add(c);
+		}
+		sceneDeck.shuffleDeck();
+	}
+	public void setSceneDeck(SceneDeck parsedDeck) {
+		this.sceneDeck = parsedDeck;
+		this.sceneDeck.shuffleDeck();
+	}
+	
+	//core game loop: Resets players to trailer, deals 10 scene cards to the sets,
+	//                and cycles player turns until scene left = 1.
     public void runGame() {
     	while(currentDay <= days) {
+    		
+    		// Setup day
     		view.showMessage("It's day " + currentDay);
     		Room trailer = board.getTrailer();
     		for (Player p : players) {
     			p.SetLocation(trailer);
     		}
-    		//player turns
-    		for(int i = 0; i < players.size(); i++) {
-    			pickAction(i);
+    		
+    		// Deal Scene Cards to sets
+    		for (Room room : board.getAllRooms()) {
+    			if(room instanceof Set) {
+    				Set set = (Set) room;
+    				Card drawnCard = sceneDeck.draw();
+    				if(drawnCard != null) {
+    					set.setActiveCard(drawnCard);
+    					// set.resetShotCounters();
+    				}
+    			}
+    		}
+    		//player turns/ day loop
+    		while(board.getRemaingScenes() > 1) {
+    			for(int i = 0; i < players.size(); i++) {
+    				pickAction(i);
+    			}
     		}
     		//all players have gone
     		view.showMessage("He who learns and runs away, lives to another day." );
@@ -102,13 +132,102 @@ public class gameManager{
             String action = view.renderAndRequestAction(request).toLowerCase().trim();
 
             // 3. Route Choice
-            if (action.equals("move") && !hasMoved && currentPlayer.getRole() == null) {
-                moveManager mover = new moveManager();
-                hasMoved = mover.reallyMove(currentPlayer);
+            //Movement: grabs adj rooms, moves player view moveManager, and sends an update
+            //            to view to announce the move and reveal any flipped cards
+            if (action.equals("move") && !hasMoved && currentPlayer.getRole() == null) {                
+                List<Room> adjRooms = loc.getAdjacent();
+                List<String> adjRoomNames = new ArrayList<>();
+                for (Room r: adjRooms) {
+                	adjRoomNames.add(r.getName());
+                }
+                adjRoomNames.add("Cancel");
+                Packet roomQuery = new Packet(currentPlayer, loc, board, adjRoomNames, Packet.EventType.QUERY_DESTINATION);
+                String userLocationChoice = view.renderAndRequestAction(roomQuery);
+                
+                //Cancel if user wants to.
+                if (userLocationChoice.equals("cancel")) {
+                	continue;
+                }
+                Room userDestination = null;
+                for(Room r : adjRooms) {
+                	if(r.getName().equalsIgnoreCase(userLocationChoice)) {
+                		userDestination = r;
+                		break;
+                	}
+                }                
+                if(userDestination != null) {
+                	MoveManager mover = new MoveManager();  	
+                	mover.movePlayer(currentPlayer, userDestination);
+                	hasMoved = true;
+                	
+                	Packet moved = new Packet(currentPlayer, userDestination, board, null, Packet.EventType.MOVED);
+                	Card cardToReveal = null;
+                	if(userDestination instanceof Set) {
+                		cardToReveal = ((Set) userDestination).getActiveCard();
+                	}
+                	moved.setMoveData(userDestination, cardToReveal);
+                	view.render(moved);
+                } else {
+                	Packet invalid = new Packet(currentPlayer, loc, board, null, Packet.EventType.INVALID_ACTION);
+                	view.render(invalid);
+                }
                 
             } else if (action.equals("take role") && currentPlayer.getRole() == null) {
-                //boolean tookRole = takeRole(currentPlayer);
-                //if (tookRole) turnComplete = true; // Taking a role ends action phase
+            	// take role: Scans current set of unoccupied off card and on card roles. Filters
+            	//            out roles player cant take. If a valid role is picked,
+            	//            role is assigned to player, marked occupied, and turn ends
+                Set currentSet = (Set) loc;
+                List<Role> availableRoles = new ArrayList<>();
+                List<String> roleNames = new ArrayList<>();
+                
+                // get all unoccupied off card roles the player has rank for
+                if(currentSet.getOnCardroles() != null) {
+                	for(Role r : currentSet.getOnCardroles()) {
+                		if(!r.getOccupied() && currentPlayer.getRank()>= r.getRank()) {
+                			availableRoles.add(r);
+                			roleNames.add(r.getName());
+                		}
+                	}
+                }
+                //if no roles for players current rank
+                if(availableRoles.isEmpty()) {
+                	view.showMessage("Your rank is too low for that.");
+                	continue;
+                }
+                
+                roleNames.add("Cancel");
+                
+                //Query for the user's wanted role
+                Packet roleQuery = new Packet(currentPlayer, loc, board, roleNames, Packet.EventType.QUERY_TAKE_ROLE);
+                String roleChoice = view.renderAndRequestAction(roleQuery);
+                
+                if(roleChoice.equalsIgnoreCase("cancel")) {
+                	continue;
+                }
+                
+                //find the role they typed
+                Role chosenR = null;
+                for (Role r : availableRoles) {
+                	if (r.getName().equalsIgnoreCase(roleChoice)) {
+                		chosenR = r;
+                		break;
+                	}
+                }
+                
+                if(chosenR != null) {
+                	currentPlayer.setRole(chosenR);
+                	chosenR.setOccupied(true);
+                	//role taken = turn over.
+                	turnComplete = true;
+                	
+                	Packet tookRole = new Packet(currentPlayer, loc, board, null, Packet.EventType.TOOK_ROLE);
+                	tookRole.setRoleData(chosenR);
+                	view.render(tookRole);
+                } else {
+                	Packet invalid = new Packet(currentPlayer, loc, board, null, Packet.EventType.INVALID_ACTION);
+                	view.render(invalid);
+                }
+                
             } else if (action.equals("work") && currentPlayer.getRole() != null) {
                 //work(currentPlayer);
                 turnComplete = true; // Working consumes the turn
