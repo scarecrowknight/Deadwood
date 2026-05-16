@@ -35,10 +35,6 @@ public class Role {
         return staringRoll;
     }
     public void setOccupied(boolean x){
-        if (x = true){
-            this.occupied = true;
-        } else{
-            this.occupied=false;
-        }
+        this.occupied = x;
     }
 }
