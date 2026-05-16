@@ -1,4 +1,4 @@
-public class moveManager{
+public class MoveManager{
 	public boolean canMove(Player player, Room playerDestination) {
 		Room currentLocation = player.currentLocation();
 		return currentLocation.getAdjacent().contains(playerDestination);
