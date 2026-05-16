@@ -61,7 +61,7 @@ public class DeadWood {
     	//(View)
     	View gameView = new View();
     	
-    	//(Controller) q
+    	//(Controller) 
     	boolean playerIsReady = gameView.askStart();
     	
     	if(playerIsReady) {
@@ -69,6 +69,9 @@ public class DeadWood {
     		gameView.showMessage("\nGame is starting...");
     		
     		GameManager gameManager = new GameManager(gameBoard, gameView);
+    		
+    		SceneDeck fullDeck = gameSetup.getDeck();
+    		gameManager.setSceneDeck(fullDeck);
     		
     		//player setup
     		gameManager.addPlayers();

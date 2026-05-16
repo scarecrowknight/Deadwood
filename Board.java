@@ -1,4 +1,3 @@
-
 import java.util.*;
 
 public class Board {
@@ -9,7 +8,9 @@ public class Board {
    public Board(){
       this.rooms = new HashMap<String,Room>();
    }
-   
+   public Collection<Room> getAllRooms(){
+	   return this.rooms.values();
+   }
    public void setTrailer(Room trailer){
       this.trailer = trailer;
    }
@@ -25,7 +26,19 @@ public class Board {
    public Room getRoom(String name){
       return this.rooms.get(name);
    }
-   
+   public int getRemaingScenes() {
+	   int count = 0;
+	   for(Room room : this.getAllRooms()) {
+		   if (room instanceof Set) {
+			   Set set = (Set) room;
+		   
+			   if(set.getActiveCard() != null) {
+				   count++;
+			   }
+		   }
+	   }
+	   return count;
+   }
    //hmm maybe not useful actually
    public void putRoom(String name){
       Room room = new Room(name, this);
@@ -54,14 +67,6 @@ public class Board {
    }
    
    
-   //main is entirely for testing don't mind this
-   public static void main(String[] args){
-      Board b = new Board();
-      
-      //String name = (b.rooms[1].getClass().getSimpleName());
-      
-            
-   }
    
 
 }
