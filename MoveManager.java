@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MoveManager {
@@ -13,17 +12,6 @@ public class MoveManager {
     // move logic sequence
     public boolean reallyMove(Player player) {
         Room currentLoc = player.currentLocation();
-        
-        // query user confirmation to move
-        Packet queryPacket = new Packet(player, currentLoc, board, Arrays.asList("Yes", "No"), Packet.EventType.QUERY_MOVE);
-        String response = view.renderAndRequestAction(queryPacket).toLowerCase().trim();
-
-        if (response.equals("no")) {
-            return false;
-        } else if (!response.equals("yes")) {
-            // invalid string typed; recurse cleanly to ask again
-            return reallyMove(player);
-        }
         //retrieve accessible adjacent rooms
         ArrayList<Room> adjRooms = currentLoc.getAdjacent();
         
