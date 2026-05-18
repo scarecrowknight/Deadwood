@@ -90,7 +90,9 @@ public String renderAndRequestAction(Packet packet) {
     render(packet);
     if (packet.getLastEvent() == Packet.EventType.QUERY_DESTINATION) {
     	System.out.println("Alright, so where are you goin'? " + packet.getAvailableActions());
-    } else {
+    } else if(packet.getLastEvent() == Packet.EventType.QUERY_MOVE) {
+    	System.out.print("Are you sure? " + packet.getAvailableActions());
+    }else {
     //showing options + requesting input
     	System.out.println("What would you like to do?" + packet.getAvailableActions());
     }
