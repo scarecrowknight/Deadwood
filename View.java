@@ -64,6 +64,30 @@ public List<String> getPlayerNames(){
     }
     return names;
 }
+public void printAvailableRoles(Set destination) {
+    showMessage("\nAvailable roles at " + destination.getName() + ":");
+    boolean foundRoles = false;
+
+    //Check Off-Card Roles (Extras)
+    if (destination.getOffCardRoles() != null) { 
+        for (Role r : destination.getOffCardRoles()) {
+            if (!r.getOccupied()) {
+                showMessage("-Extra: " + r.getName() + " (Req. Rank " + r.getRank() + ")");
+                foundRoles = true;
+      
+            }}}
+
+    //Check On-Card Roles (Starring)
+    if (destination.getOnCardroles() != null) {
+        for (Role r : destination.getOnCardroles()) {
+            if (!r.getOccupied()) {
+                showMessage("-Starring: " + r.getName() + " (Req. Rank " + r.getRank() + ")");
+                foundRoles = true;
+            }}}
+    if (!foundRoles) {
+        showMessage("  (No roles currently available here)");
+    }
+}
 public void render(Packet packet) {
     if (packet.getLastEvent() == null) return;
     
@@ -91,7 +115,7 @@ public String renderAndRequestAction(Packet packet) {
     if (packet.getLastEvent() == Packet.EventType.QUERY_DESTINATION) {
     	System.out.println("Alright, so where are you goin'? " + packet.getAvailableActions());
     } else if(packet.getLastEvent() == Packet.EventType.QUERY_MOVE) {
-    	System.out.print("Are you sure? " + packet.getAvailableActions());
+    	System.out.println("Are you sure? " + packet.getAvailableActions());
     }else {
     //showing options + requesting input
     	System.out.println("What would you like to do?" + packet.getAvailableActions());
