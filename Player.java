@@ -24,8 +24,14 @@ public class Player{
     public Room currentLocation() {
     	return location;
     }
-    public void SetLocation(Room location) {
-    	this.location = location;
+    public void SetLocation(Room newLocation) {
+        if (this.location != null) {
+            this.location.removePlayer(this);
+        }
+        this.location = newLocation;
+        if (this.location != null) {
+            this.location.addPlayer(this);
+        }
     }
      public String getName() {
         return name;

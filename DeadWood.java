@@ -58,7 +58,7 @@ public class DeadWood {
     	DeadWood gameSetup = new DeadWood();
     	Board gameBoard = gameSetup.getBoard();
     
-    	//(View)
+    	//(View)y
     	View gameView = new View();
     	
     	//(Controller) 

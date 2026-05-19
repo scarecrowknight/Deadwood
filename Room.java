@@ -9,9 +9,8 @@ public class Room {
    
    public Room(String name, Board board){
       this.name = name;
-      ArrayList<Room> adj = new ArrayList<Room>();
-      this.adjacentRooms = adj; 
-
+      this.adjacentRooms = new ArrayList<Room>();
+      this.players = new ArrayList<Player>();
    }
    
    // alt constructor for if you know adj rooms already
@@ -19,8 +18,7 @@ public class Room {
    public Room(String name, ArrayList<Room> adj, Board board){
       this.name = name;
       this.adjacentRooms = adj;
-
-      
+      this.players = new ArrayList<Player>();
    }
    
    public void addAdjacent(Room room){
@@ -34,6 +32,15 @@ public class Room {
    }
    public String toString() {
 	   return this.name;
+   }
+   public void addPlayer(Player player) {
+      this.players.add(player);
+   }
+   public void removePlayer(Player player) {
+      this.players.remove(player);
+   }
+   public ArrayList<Player> getPlayers() {
+      return this.players;
    }
 
 }
