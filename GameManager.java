@@ -56,7 +56,7 @@ public class GameManager{
     		view.showMessage("He who learns and runs away, lives to another day." );
     		currentDay++;
     	}
-    	view.showMessage("The game is over... time to pack it up...");
+    	gameOver();
     }
     
     public int totalPlayers() {

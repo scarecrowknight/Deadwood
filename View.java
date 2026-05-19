@@ -29,16 +29,29 @@ public class View{
 		System.out.println("______CURRENT BOARD_____");
 		
 		for (Room room : board.getAllRooms()) {
-			if(room instanceof Set) {
+			if(room instanceof Set ) {
 				Set set = (Set) room;
-				System.out.println("Room: " + room.getName() + " Shot Count: " + set.getShotCount() + "Budget: " + set.getActiveCard().getBudget());
-				System.out.println(" Adjacent to: " + room.getAdjacent());
-	            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
-	                System.out.print(" Players in room: ");
-	                for (Player player : room.getPlayers()) {
-	                    System.out.print(player.getName() + ", ");
-	                }
-	                System.out.println();
+				if(set.getActiveCard() != null) {
+					System.out.println("Room: " + room.getName() + " Shot Count: " + set.getShotCount() + " Budget: " + set.getActiveCard().getBudget());
+					System.out.println(" Adjacent to: " + room.getAdjacent());
+		            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
+		                System.out.print(" Players in room: ");
+		                for (Player player : room.getPlayers()) {
+		                    System.out.print(player.getName() + ", ");
+		                }
+		                System.out.println();
+		            }
+	            } else {
+	            	System.out.println("Room: " + room.getName() + ". The card is flipped and the scene is closed currently.");
+					System.out.println(" Adjacent to: " + room.getAdjacent());
+		            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
+		                System.out.print(" Players in room: ");
+		                for (Player player : room.getPlayers()) {
+		                    System.out.print(player.getName() + ", ");
+		                }
+		                System.out.println();
+		            }
+	            	
 	            }
 	        } else {
 	        	System.out.println("Room: " + room.getName());
@@ -117,14 +130,25 @@ public void render(Packet packet) {
     	System.out.println("Hey " + packet.getPlayer().getName() + "! You're on now!" );
     	System.out.println("Current player: " + packet.getPlayer().getName());
     	System.out.println("Location: " + packet.getLocation().getName());
-        System.out.println("Money: " + packet.getPlayer().getMoney() + "Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
+        System.out.println("Money: " + packet.getPlayer().getMoney() + ", Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
     	break; 	
     case INVALID_ACTION:
     	System.out.println("Invalid action... Don't do that again...");
     	break;
     case MOVED:
     	String roomName = packet.getLastLocation().getName();
-    	System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName());
+    	
+    	if(packet.getLocation() instanceof Set) {
+    		Set set = (Set) packet.getLocation();
+    		if(set.getActiveCard() != null)
+    			System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ", Budget: " + set.getActiveCard().getBudget());
+    		else {
+    			System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ". The card is flipped and the scene is closed currently.");	
+    		}
+    	} else {
+    		System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName());
+    		
+    	}
     	break;
     case SCENE_REVEALED:
     	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
@@ -134,6 +158,7 @@ public void render(Packet packet) {
     	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	Set set = (Set) packet.getLocation();
     	System.out.println("Shots left:" + set.getShotCount());
+    	
     case REHEARSED:
     	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	break;
@@ -186,7 +211,7 @@ public String renderAndRequestAction(Packet packet) {
     return this.scanner.nextLine();
 }
     public void exitMessage() {
-        System.out.println("Press Enter to exit...");
+        System.out.println("You should leave...");
         this.scanner.nextLine();
     }
 }

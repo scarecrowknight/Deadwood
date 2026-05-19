@@ -52,7 +52,7 @@ public class DeadWood {
     	DeadWood gameSetup = new DeadWood();
     	Board gameBoard = gameSetup.getBoard();
     
-    	//(View)y
+    	//(View)
     	View gameView = new View();
     	
     	//(Controller) 
@@ -66,7 +66,6 @@ public class DeadWood {
     		
     		SceneDeck fullDeck = gameSetup.getDeck();
     		gameManager.setSceneDeck(fullDeck);
-    		
     		//player setup
     		gameManager.addPlayers();
     		gameManager.randomizeTurnOrder();

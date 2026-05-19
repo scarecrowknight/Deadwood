@@ -34,7 +34,11 @@ public class Set extends Room {
    }
    
    public ArrayList<Role> getOnCardroles() {
-      return this.activeCard.getRoles();
+	  if(this.activeCard != null) {
+		  return this.activeCard.getRoles();
+	  } else {
+		  return null;
+	  }
    }
    
    public void setRoles(ArrayList<Role> roles) {
