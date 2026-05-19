@@ -3,7 +3,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.io.File;
 
 import java.util.*;
 
@@ -54,30 +53,13 @@ public class XMLCardParser extends XMLParser{
          Node lineNode = filterChild(part, childName);
          String quote = lineNode.getTextContent();
          
-         Role role = new Role(name, quote, level, false, false);
+         Role role = new Role(name, quote, level, false, true);
          
          roles.add(role);
          
          }
          
       return roles;
-   }
-
-      public static void main(String[] args){
-      XMLCardParser p = new XMLCardParser();
-      Board b = new Board();
-      String filename = "cards.xml";
-      try{
-         Document d = p.getDocFromFile(filename);
-         SceneDeck deck = new SceneDeck();
-         p.readCards(d, deck);
-         for(int i=0; i<41;i++){
-            System.out.println(deck.draw());
-         }
-      } catch(Exception e) {
-         System.out.println(":c");
-         e.printStackTrace();
-      }
    }
 
 }

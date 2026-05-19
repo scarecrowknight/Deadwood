@@ -29,15 +29,28 @@ public class View{
 		System.out.println("______CURRENT BOARD_____");
 		
 		for (Room room : board.getAllRooms()) {
-			System.out.println("Room: " + room.getName());
-			System.out.println(" Adjacent to: " + room.getAdjacent());
-            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
-                System.out.print(" Players in room: ");
-                for (Player player : room.getPlayers()) {
-                    System.out.print(player.getName() + ", ");
-                }
-                System.out.println();
-            }
+			if(room instanceof Set) {
+				Set set = (Set) room;
+				System.out.println("Room: " + room.getName() + " Shot Count: " + set.getShotCount() + "Budget: " set.getBudget());
+				System.out.println(" Adjacent to: " + room.getAdjacent());
+	            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
+	                System.out.print(" Players in room: ");
+	                for (Player player : room.getPlayers()) {
+	                    System.out.print(player.getName() + ", ");
+	                }
+	                System.out.println();
+	            }
+	        } else {
+	        	System.out.println("Room: " + room.getName());
+				System.out.println(" Adjacent to: " + room.getAdjacent());
+	            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
+	                System.out.print(" Players in room: ");
+	                for (Player player : room.getPlayers()) {
+	                    System.out.print(player.getName() + ", ");
+	                }
+	                System.out.println();
+	            }
+	        }
             
 		}
 	System.out.println("__________________");
@@ -133,8 +146,14 @@ public void render(Packet packet) {
     case QUERY_WORK:
     	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	break;
+    case SCENE_WRAPPED:
+    	System.out.println("The scene is over and you should leave...");
+    	break;
+    case UPGRADED:
+    	System.out.println("The scene is over and you should leave...");
+    	break;
     case END_GAME:
-    	
+    	// ends the game
     	break;
     default:
     	break;

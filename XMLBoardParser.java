@@ -74,7 +74,7 @@ public class XMLBoardParser extends XMLParser{
    
    private void parseOffice(NodeList officeNodeList, Board b){
       Node officeNode = officeNodeList.item(0);
-      String name = "office";
+      String name = "Casting Office";
       CastingOffice office = new CastingOffice(name, b);
   
       b.putRoom(office.getName(), office);
@@ -101,7 +101,7 @@ public class XMLBoardParser extends XMLParser{
          int shotCount = parseTakes(setNode);
          
          ArrayList<Role> roles = parseParts(setNode);
-         
+         //ivy continue from here and add budget in parser :)
          Set set = new Set(name, b, shotCount, roles);
          
          b.putRoom(set.getName(), set);

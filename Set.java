@@ -7,12 +7,14 @@ public class Set extends Room {
 	also its size is the max number of roles for the scene */
 	private ArrayList<Role> roles = null;
 	private Card activeCard = null;
+	private int budget;
 	
-   public Set(String name, Board board, int shotCount, ArrayList<Role> roles) {
+   public Set(String name, Board board, int shotCount, ArrayList<Role> roles, int budget) {
 	   super(name, board);
 	   this.shotCount = shotCount; //contains shots to be applied by board manager
-	   this.currentPlayers = currentPlayers; //list of current players on set
+	   this.currentPlayers = new ArrayList<Player>(); //list of current players on set
 	   this.roles = roles; //containes the the "static roles" to be appended by parser
+	   this.budget = budget;
    }
    
    public Card getActiveCard() {
@@ -27,6 +29,9 @@ public class Set extends Room {
    }
    public void setShotCount(int shotCount) {
 	   this.shotCount = shotCount;
+   }
+   public int getBudget() {
+	   return this.budget;
    }
 
    public ArrayList<Role> getOffCardRoles() {

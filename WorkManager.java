@@ -61,12 +61,13 @@ public class WorkManager {
         boolean sceneWrapped = false;
 
         if (success) {
-            //succsess
+            //success
             set.setShotCount(set.getShotCount() - 1);
             sceneWrapped = (set.getShotCount() <= 0);
 
             //calculate rewards
-            if (role.getStarringRoll()) { 
+            
+            if (role.getStarringRole()) { 
                 creditDelta = 2;
                 player.setCredits(player.getCredits() + creditDelta);
             } else { 
@@ -88,7 +89,7 @@ public class WorkManager {
 
         } else {
             //fail
-            if (!role.getStarringRoll()) {
+            if (!role.getStarringRole()) {
                 moneyDelta = 1;
                 player.setMoney(player.getMoney() + moneyDelta);
             }
@@ -108,7 +109,7 @@ public class WorkManager {
         for (Player p : allPlayers) {
             if (p.currentLocation() == set && p.getRole() != null) {
                 playersOnSet.add(p);
-                if (p.getRole().getStarringRoll()) {
+                if (p.getRole().getStarringRole()) {
                     onCardPlayers.add(p);
                 } else {
                     offCardPlayers.add(p);
