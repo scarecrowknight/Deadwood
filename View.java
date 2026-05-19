@@ -31,9 +31,14 @@ public class View{
 		for (Room room : board.getAllRooms()) {
 			System.out.println("Room: " + room.getName());
 			System.out.println(" Adjacent to: " + room.getAdjacent());
+            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
+                System.out.println(" Players in room: " + room.getPlayers());
+            }
+            
 		}
-		System.out.println("__________________");
-	}
+	System.out.println("__________________");
+    }
+	
 	public void showMessage(String message) {
 		System.out.println(message);
 	}

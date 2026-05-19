@@ -33,6 +33,8 @@ public class MoveManager {
         for (Room r : adjRooms) {
             if (r.getName().equalsIgnoreCase(chosenRoomName)) {
                 destination = r;
+                r.addPlayer(player);
+                currentLoc.removePlayer(player);
                 break;
             }
         }

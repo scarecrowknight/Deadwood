@@ -138,43 +138,6 @@ public class GameManager{
                 MoveManager mover = new MoveManager(board, view);    
                 mover.reallyMove(currentPlayer);
                 hasMoved = true;           
-                /*List<Room> adjRooms = loc.getAdjacent();
-                List<String> adjRoomNames = new ArrayList<>();
-                for (Room r: adjRooms) {
-                	adjRoomNames.add(r.getName());
-                }
-                adjRoomNames.add("Cancel");
-                Packet roomQuery = new Packet(currentPlayer, loc, board, adjRoomNames, Packet.EventType.QUERY_DESTINATION);
-                String userLocationChoice = view.renderAndRequestAction(roomQuery);
-                
-                //Cancel if user wants to.
-                if (userLocationChoice.equals("cancel")) {
-                	continue;
-                }
-                Room userDestination = null;
-                for(Room r : adjRooms) {
-                	if(r.getName().equalsIgnoreCase(userLocationChoice)) {
-                		userDestination = r;
-                		break;
-                	}
-                }                
-                if(userDestination != null) {
-                	MoveManager mover = new MoveManager();  	
-                	mover.movePlayer(currentPlayer, userDestination);
-                	hasMoved = true;
-                	
-                	Packet moved = new Packet(currentPlayer, userDestination, board, null, Packet.EventType.MOVED);
-                	Card cardToReveal = null;
-                	if(userDestination instanceof Set) {
-                		cardToReveal = ((Set) userDestination).getActiveCard();
-                	}
-                	moved.setMoveData(userDestination, cardToReveal);
-                	view.render(moved);
-                } else {
-                	Packet invalid = new Packet(currentPlayer, loc, board, null, Packet.EventType.INVALID_ACTION);
-                	view.render(invalid);
-                } */
-                
             } else if (action.equals("take role") && currentPlayer.getRole() == null) {
             	TakeRoleManager takeRoleManager = new TakeRoleManager(board, view);
                 takeRoleManager.TakeRole(currentPlayer);
