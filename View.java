@@ -42,7 +42,6 @@ public class View{
 		}
 	System.out.println("__________________");
     }
-	
 	public void showMessage(String message) {
 		System.out.println(message);
 	}
@@ -115,9 +114,21 @@ public void render(Packet packet) {
     	break;
     case SCENE_REVEALED:
     	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
-    	break;	
+    	break;
+    case ACT_SUCCESS:
+    	System.out.println("Winner winner chicken dinner!");
+    	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "\n");
+    	Set set = (Set) packet.getLocation();
+    	System.out.println("Shots left:" + set.getShotCount());
+    case REHEARSED:
+    	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	break;
     default:
     	break;
+    case ACT_FAIL:
+    	System.out.println("You're a loser and you failed.");
+    	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() +"\n");
+        
     }
 }
 public String renderAndRequestAction(Packet packet) {
