@@ -28,7 +28,7 @@ public class Packet{
         QUERY_UPGRADE_RANK,
         QUERY_UPGRADE_PAYMENT,
         //end game event.
-        END_GAME
+        GAME_OVER,
     }
 
     //game info 
@@ -62,6 +62,10 @@ public class Packet{
     //move phase
     private List<Room> adjacentRooms;
     private Room prevLocation;
+
+    // end-game results
+    private List<Player> finalRanking;
+    private List<Integer> finalScores;
 
     //core builder
     public Packet(Player player, Room location, Board board, List<String> availableActions, EventType lastEvent) {
@@ -165,5 +169,13 @@ public class Packet{
         this.adjacentRooms = adjacentRooms;
     }
     public List<Room> getAdjacentRooms() { return adjacentRooms; }
+
+    // end-game builders / getters
+    public void setEndGameData(List<Player> finalRanking, List<Integer> finalScores) {
+        this.finalRanking = finalRanking;
+        this.finalScores = finalScores;
+    }
+    public List<Player> getFinalRanking() { return finalRanking; }
+    public List<Integer> getFinalScores() { return finalScores; }
 }
 
