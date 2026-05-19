@@ -27,6 +27,8 @@ public class Packet{
         INVALID_ACTION,
         QUERY_UPGRADE_RANK,
         QUERY_UPGRADE_PAYMENT,
+        //end game event.
+        END_GAME
     }
 
     //game info 
@@ -59,6 +61,7 @@ public class Packet{
 
     //move phase
     private List<Room> adjacentRooms;
+    private Room prevLocation;
 
     //core builder
     public Packet(Player player, Room location, Board board, List<String> availableActions, EventType lastEvent) {
@@ -68,6 +71,16 @@ public class Packet{
         this.availableActions = availableActions;
         this.lastEvent = lastEvent;
     }
+    
+    public Packet(Player player, Room location, Room prevLocation, Board board, List<String> availableActions, EventType lastEvent) {
+        this.player = player;
+        this.location = location;
+        this.prevLocation = prevLocation;
+        this.board = board;
+        this.availableActions = availableActions;
+        this.lastEvent = lastEvent;
+    }
+    
     //basic getters
     public Player getPlayer() { return player; }
     public Room getLocation() { return location; }
@@ -142,7 +155,9 @@ public class Packet{
     public boolean canPayDollars() { return canPayDollars; }
     public boolean canPayCredits() { return canPayCredits; }
 
-
+    public Room getLastLocation() {
+    	return this.prevLocation;
+    }
     //move phase builder
     
     // move query builders & getters
