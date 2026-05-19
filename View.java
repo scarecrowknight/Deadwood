@@ -117,7 +117,6 @@ public void render(Packet packet) {
     	System.out.println("Hey " + packet.getPlayer().getName() + "! You're on now!" );
     	System.out.println("Current player: " + packet.getPlayer().getName());
     	System.out.println("Location: " + packet.getLocation().getName());
-        System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank());
         System.out.println("Money: " + packet.getPlayer().getMoney() + "Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
     	break; 	
     case INVALID_ACTION:
@@ -129,6 +128,7 @@ public void render(Packet packet) {
     	break;
     case SCENE_REVEALED:
     	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
+    	break;	
     case ACT_SUCCESS:
     	System.out.println("Winner winner chicken dinner!");
     	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
