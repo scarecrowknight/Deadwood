@@ -180,7 +180,8 @@ public class GameManager{
                 takeRoleManager.TakeRole(currentPlayer);
                 hasMoved = true; // Taking a role consumes the move action, but not the whole turn (player can still work if they take a role)
             } else if (action.equals("work") && currentPlayer.getRole() != null) {
-                //work(currentPlayer);
+                WorkManager work = new WorkManager(board, view, players);
+                work.work(currentPlayer);
                 turnComplete = true; // Working consumes the turn
             } else if (action.equals("upgrade") && loc instanceof CastingOffice) {
                 UpgradeManager upgradeManager = new UpgradeManager(board, view);

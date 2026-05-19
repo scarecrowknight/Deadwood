@@ -21,6 +21,7 @@ public class Packet{
         ACT_FAIL,
         REHEARSED,
         REHEARSAL_MAXED,
+        SCENE_WRAPPED,
         // Upgrade Phase Events
         UPGRADED,
         INVALID_ACTION,

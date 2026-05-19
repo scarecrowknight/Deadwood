@@ -24,4 +24,7 @@ public class Card{
 	   return this.name;
    }
 
+   public int getBudget() {
+      return this.budget;
+   }
 }
