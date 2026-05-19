@@ -28,7 +28,7 @@ public class Packet{
         QUERY_UPGRADE_RANK,
         QUERY_UPGRADE_PAYMENT,
         //end game event.
-        END_GAME
+        GAME_OVER,
     }
 
     //game info 

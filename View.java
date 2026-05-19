@@ -116,22 +116,6 @@ public void render(Packet packet) {
     case SCENE_REVEALED:
     	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
     	break;	
-    case GAME_OVER:
-        System.out.println("\nGAME OVER: Final Standings");
-        List<Player> ranking = packet.getFinalRanking();
-        List<Integer> scores = packet.getFinalScores();
-        if (ranking != null && scores != null && ranking.size() == scores.size()) {
-            for (int i = 0; i < ranking.size(); i++) {
-                Player p = ranking.get(i);
-                int s = scores.get(i);
-                System.out.println((i+1) + ". " + p.getName() + " - Score: " + s + " (Money:" + p.getMoney() + ", Credits:" + p.getCredits() + ", Rank:" + p.getRank() + ")");
-            }
-        } else {
-            System.out.println("No final standings available.");
-        }
-        System.out.println("\n");
-        break;
-    	break;
     case ACT_SUCCESS:
     	System.out.println("Winner winner chicken dinner!");
     	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
@@ -149,8 +133,20 @@ public void render(Packet packet) {
     case QUERY_WORK:
     	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	break;
-    case END_GAME:
-    	
+    case GAME_OVER:
+        System.out.println("\nGAME OVER: Final Standings");
+        List<Player> ranking = packet.getFinalRanking();
+        List<Integer> scores = packet.getFinalScores();
+        if (ranking != null && scores != null && ranking.size() == scores.size()) {
+            for (int i = 0; i < ranking.size(); i++) {
+                Player p = ranking.get(i);
+                int s = scores.get(i);
+                System.out.println((i+1) + ". " + p.getName() + " - Score: " + s + " (Money:" + p.getMoney() + ", Credits:" + p.getCredits() + ", Rank:" + p.getRank() + ")");
+            }
+        } else {
+            System.out.println("No final standings available.");
+        }
+        System.out.println("\n");
     	break;
     default:
     	break;
