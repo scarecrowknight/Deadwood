@@ -105,7 +105,7 @@ public void render(Packet packet) {
     	System.out.println("Hey " + packet.getPlayer().getName() + "! You're on now!" );
     	System.out.println("Current player: " + packet.getPlayer().getName());
     	System.out.println("Location: " + packet.getLocation().getName());
-        System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank());
+        System.out.println("Money: " + packet.getPlayer().getMoney() + "Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
     	break; 	
     case INVALID_ACTION:
     	System.out.println("Invalid action... Don't do that again...");
@@ -116,6 +116,21 @@ public void render(Packet packet) {
     case SCENE_REVEALED:
     	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
     	break;	
+    case GAME_OVER:
+        System.out.println("\nGAME OVER: Final Standings");
+        List<Player> ranking = packet.getFinalRanking();
+        List<Integer> scores = packet.getFinalScores();
+        if (ranking != null && scores != null && ranking.size() == scores.size()) {
+            for (int i = 0; i < ranking.size(); i++) {
+                Player p = ranking.get(i);
+                int s = scores.get(i);
+                System.out.println((i+1) + ". " + p.getName() + " - Score: " + s + " (Money:" + p.getMoney() + ", Credits:" + p.getCredits() + ", Rank:" + p.getRank() + ")");
+            }
+        } else {
+            System.out.println("No final standings available.");
+        }
+        System.out.println("\n");
+        break;
     default:
     	break;
     }
@@ -133,4 +148,8 @@ public String renderAndRequestAction(Packet packet) {
     System.out.print("> ");
     return this.scanner.nextLine();
 }
+    public void exitMessage() {
+        System.out.println("Press Enter to exit...");
+        this.scanner.nextLine();
+    }
 }
