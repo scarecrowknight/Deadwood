@@ -31,7 +31,7 @@ public class View{
 		for (Room room : board.getAllRooms()) {
 			if(room instanceof Set) {
 				Set set = (Set) room;
-				System.out.println("Room: " + room.getName() + " Shot Count: " + set.getShotCount() + "Budget: " set.getBudget());
+				System.out.println("Room: " + room.getName() + " Shot Count: " + set.getShotCount() + "Budget: " + set.getActiveCard().getBudget());
 				System.out.println(" Adjacent to: " + room.getAdjacent());
 	            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
 	                System.out.print(" Players in room: ");
@@ -150,7 +150,7 @@ public void render(Packet packet) {
     	System.out.println("The scene is over and you should leave...");
     	break;
     case UPGRADED:
-    	System.out.println("The scene is over and you should leave...");
+    	System.out.println("Congrats you got a new rank, you upgraded to " + packet.getPlayer().getRank());
     	break;
     case GAME_OVER:
         System.out.println("\nGAME OVER: Final Standings");

@@ -59,7 +59,7 @@ public class DeadWood {
     	boolean playerIsReady = gameView.askStart();
     	
     	if(playerIsReady) {
-    		gameView.printFullBoard(gameBoard);
+    		
     		gameView.showMessage("\nGame is starting...");
     		
     		GameManager gameManager = new GameManager(gameBoard, gameView);
