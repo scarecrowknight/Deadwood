@@ -56,7 +56,9 @@ public class MoveManager {
         Packet moveConfirm = new Packet(player, destination, board, null, Packet.EventType.MOVED);
         moveConfirm.setMoveData(destination, cardToReveal);
         view.render(moveConfirm);
-
+        if (destination instanceof Set) {
+        	view.printAvailableRoles((Set) destination);
+        }
         return true;
 	
 }

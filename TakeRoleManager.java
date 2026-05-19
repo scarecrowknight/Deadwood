@@ -18,14 +18,22 @@ public class TakeRoleManager {
                 List<Role> availableRoles = new ArrayList<>();
                 List<String> roleNames = new ArrayList<>();
                 
+                view.showMessage(currentPlayer.getName() + "'s rank is:" + currentPlayer.getRank() + ".");
                 // get all unoccupied off card roles the player has rank for
                 if(currentSet.getOnCardroles() != null) {
                 	for(Role r : currentSet.getOnCardroles()) {
                 		if(!r.getOccupied() && currentPlayer.getRank()>= r.getRank()) {
                 			availableRoles.add(r);
-                			roleNames.add(r.getName());
+                			roleNames.add(r.getName() + " (Req. Rank " + r.getRank() + ")");
                 		}
                 	}
+                }
+                if(currentSet.getOffCardRoles() != null) {
+                	for(Role r : currentSet.getOffCardRoles())
+                		if(!r.getOccupied() && currentPlayer.getRank() >= r.getRank()) {
+                			availableRoles.add(r);
+                			roleNames.add(r.getName() + " (Req. Rank " + r.getRank() + ")");
+                		}
                 }
                 //if no roles for players current rank
                 if(availableRoles.isEmpty()) {
