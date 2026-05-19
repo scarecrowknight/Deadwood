@@ -42,7 +42,6 @@ public class View{
 		}
 	System.out.println("__________________");
     }
-	
 	public void showMessage(String message) {
 		System.out.println(message);
 	}
@@ -111,7 +110,8 @@ public void render(Packet packet) {
     	System.out.println("Invalid action... Don't do that again...");
     	break;
     case MOVED:
-    	System.out.println("Moved to:" + packet.getTargetLocation().getName());
+    	String roomName = packet.getLastLocation().getName();
+    	System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName());
     	break;
     case SCENE_REVEALED:
     	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
@@ -131,8 +131,30 @@ public void render(Packet packet) {
         }
         System.out.println("\n");
         break;
+    	break;
+    case ACT_SUCCESS:
+    	System.out.println("Winner winner chicken dinner!");
+    	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	Set set = (Set) packet.getLocation();
+    	System.out.println("Shots left:" + set.getShotCount());
+    case REHEARSED:
+    	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	break;
+    case ACT_FAIL:
+    	System.out.println("You're a loser and you failed.");
+    	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	set = (Set) packet.getLocation();
+    	System.out.println("Shots left:" + set.getShotCount());
+    	break;
+    case QUERY_WORK:
+    	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	break;
+    case END_GAME:
+    	
+    	break;
     default:
     	break;
+    
     }
 }
 public String renderAndRequestAction(Packet packet) {
