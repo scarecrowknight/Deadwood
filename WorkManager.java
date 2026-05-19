@@ -100,8 +100,66 @@ public class WorkManager {
         }
     }
 
-       private void wrapScene(Set set, Card card) {
-        //need to implement
-    
+        private void wrapScene(Set set, Card card) {
+        List<Player> playersOnSet = new ArrayList<>();
+        List<Player> onCardPlayers = new ArrayList<>();
+        List<Player> offCardPlayers = new ArrayList<>();
+
+        for (Player p : allPlayers) {
+            if (p.currentLocation() == set && p.getRole() != null) {
+                playersOnSet.add(p);
+                if (p.getRole().getStarringRoll()) {
+                    onCardPlayers.add(p);
+                } else {
+                    offCardPlayers.add(p);
+                }
+            }
+        }
+
+        //check for bonuses
+        if (!onCardPlayers.isEmpty()) {
+            
+            //payouts
+            int budget = card.getBudget();
+            List<Integer> diceRolls = new ArrayList<>();
+            
+            //roll dice equal to the budget
+            for (int i = 0; i < budget; i++) {
+                diceRolls.add((int) (Math.random() * 6) + 1);
+            }
+            // Sort rolls highest to lowest
+            diceRolls.sort(Collections.reverseOrder());
+
+            List<Role> onCardRoles = new ArrayList<>(card.getRoles());
+            onCardRoles.sort((r1, r2) -> Integer.compare(r2.getRank(), r1.getRank()));
+            for (int i = 0; i < diceRolls.size(); i++) {
+                int roll = diceRolls.get(i);
+                Role roleToReceive = onCardRoles.get(i % onCardRoles.size());
+
+                for (Player p : onCardPlayers) {
+                    if (p.getRole() == roleToReceive) {
+                        p.setMoney(p.getMoney() + roll);
+                        break;
+                    }
+                }
+            }
+
+            //extras bonus
+            for (Player p : offCardPlayers) {
+                int bonus = p.getRole().getRank();
+                p.setMoney(p.getMoney() + bonus);
+            }
+        }
+
+        //clear roles and practice chips for all players on the set
+        for (Player p : playersOnSet) {
+            p.setRole(null);
+            p.setPracticeChips(0);
+        }
+        //remove the card from the board
+        set.setActiveCard(null);
+
+        Packet wrapPacket = new Packet(null, set, board, null, Packet.EventType.SCENE_WRAPPED); 
+        view.render(wrapPacket);
     }
 }
