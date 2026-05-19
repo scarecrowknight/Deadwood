@@ -153,12 +153,53 @@ public class GameManager{
                 turnComplete = true;
             } else if (action.equals("view board")) {
                 view.printFullBoard(board);
-            } else {
+            } else if (action.equals("end game")) {
+                gameOver();
+                break;
+            }
+            else {
                 Packet invalid = new Packet(currentPlayer, loc, board, null, Packet.EventType.INVALID_ACTION);
                 view.render(invalid);
             }
         }
     }
+    public void gameOver() {
+        //tally scores and announce winner
+        // compute scores and build ranking list
+        List<Player> ranking = new ArrayList<>(players);
+        List<Integer> scores = new ArrayList<>();
+        // compute score per player
+        for (Player p : ranking) {
+            int score = p.getMoney() + p.getCredits() + (5 * p.getRank());
+            scores.add(score);
+        }
+        // sort ranking and scores together by score descending, using tie-breakers
+        for (int i = 0; i < ranking.size(); i++) {
+            for (int j = i+1; j < ranking.size(); j++) {
+                int scoreI = scores.get(i);
+                int scoreJ = scores.get(j);
+                if (scoreJ > scoreI || (scoreJ == scoreI && (
+                    ranking.get(j).getRank() > ranking.get(i).getRank() ||
+                    (ranking.get(j).getRank() == ranking.get(i).getRank() && ranking.get(j).getCredits() > ranking.get(i).getCredits()) ||
+                    (ranking.get(j).getRank() == ranking.get(i).getRank() && ranking.get(j).getCredits() == ranking.get(i).getCredits() && ranking.get(j).getMoney() > ranking.get(i).getMoney())
+                ))) {
+                    // swap
+                    Player temp = ranking.get(i);
+                    ranking.set(i, ranking.get(j));
+                    ranking.set(j, temp);
+                    int tmpS = scores.get(i);
+                    scores.set(i, scores.get(j));
+                    scores.set(j, tmpS);
+                }
+            }
+        }
+        // Build packet with final standings and hand it to the view to announce
+        Packet endPacket = new Packet(null, null, board, null, Packet.EventType.GAME_OVER);
+        endPacket.setEndGameData(ranking, scores);
+        view.render(endPacket);
+        // pause to let players read final standings, then exit
+        view.exitMessage();
+        System.exit(0);
 }
-
+}
 	
