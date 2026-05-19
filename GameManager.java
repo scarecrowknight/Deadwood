@@ -107,7 +107,7 @@ public class GameManager{
         while (!turnComplete) {
             List<String> availableActions = new ArrayList<>();
             Room loc = currentPlayer.currentLocation();
-
+            
             //determine valid choices based on state
             if (currentPlayer.getRole() != null) {
                 //if working a role they MUST work. No moving or upgrading.
@@ -126,7 +126,7 @@ public class GameManager{
                 }
             }
             availableActions.add("End Turn");
-            
+            availableActions.add("View Board");
             // 2. Request Choice via DTO Request
             Packet request = new Packet(currentPlayer, loc, board, availableActions, null);
             String action = view.renderAndRequestAction(request).toLowerCase().trim();
@@ -151,6 +151,8 @@ public class GameManager{
                 upgradeManager.upgrade(currentPlayer);
             } else if (action.equals("end turn")) {
                 turnComplete = true;
+            } else if (action.equals("view board")) {
+                view.printFullBoard(board);
             } else {
                 Packet invalid = new Packet(currentPlayer, loc, board, null, Packet.EventType.INVALID_ACTION);
                 view.render(invalid);

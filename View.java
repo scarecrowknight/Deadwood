@@ -32,7 +32,11 @@ public class View{
 			System.out.println("Room: " + room.getName());
 			System.out.println(" Adjacent to: " + room.getAdjacent());
             if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
-                System.out.println(" Players in room: " + room.getPlayers());
+                System.out.print(" Players in room: ");
+                for (Player player : room.getPlayers()) {
+                    System.out.print(player.getName() + ", ");
+                }
+                System.out.println();
             }
             
 		}
