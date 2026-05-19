@@ -105,6 +105,7 @@ public void render(Packet packet) {
     	System.out.println("Hey " + packet.getPlayer().getName() + "! You're on now!" );
     	System.out.println("Current player: " + packet.getPlayer().getName());
     	System.out.println("Location: " + packet.getLocation().getName());
+        System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank());
     	break; 	
     case INVALID_ACTION:
     	System.out.println("Invalid action... Don't do that again...");
