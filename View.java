@@ -1,103 +1,203 @@
 import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
 
-public class View{
+public class View extends JFrame{
    
-	private Scanner scanner;
+	private JLayeredPane boardPane;
+	private JLabel boardLabel;
+	private JTextArea gameLog;
+
+	private JPanel actionPanel;
+	private JLabel promptLabel;
+	private JPanel buttonPanel;
+	
+	//tracking user input	
+	private volatile String stringResponse = null;
+	private volatile Boolean buttonResponse = null;
 
 	public View(){
-		this.scanner = new Scanner(System.in);
-	}   
+		this.setLayout(new BorderLayout());
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		// Setup game board
+		this.boardPane = new JLayeredPane();
+		ImageIcon gameBoardImage = new ImageIcon("Images/board.jpg");
+		this.boardLabel = new JLabel(gameBoardImage);
+
+		//set size of the board
+		int width = gameBoardImage.getIconWidth();
+		int height = gameBoardImage.getIconHeight();
+
+		this.boardPane.setPreferredSize(new Dimension(width, height));
+		this.boardLabel.setBounds(0, 0, width, height);
+
+		this.boardPane.add(boardLabel, Integer.valueOf(0)); // Add board to the lowest layer
+		this.add(boardPane, BorderLayout.CENTER);
+
+		// Setup game log
+		this.gameLog = new JTextArea(10, 30);
+		this.gameLog.setEditable(false);
+		this.gameLog.setLineWrap(true);
+
+		JScrollPane scrollPane = new JScrollPane(this.gameLog);
+
+		JPanel sidePanel = new JPanel(new BorderLayout());
+		sidePanel.add(new JLabel("Game Log"), BorderLayout.NORTH);
+		sidePanel.add(scrollPane, BorderLayout.CENTER);
+
+		//setup action panel	
+		this.actionPanel = new JPanel();
+		this.promptLabel = new JLabel("Initializing...");
+		this.promptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		this.buttonPanel = new JPanel(new FlowLayout());
+
+		this.actionPanel.add(this.promptLabel);
+		this.actionPanel.add(this.buttonPanel);
+		sidePanel.add(this.actionPanel, BorderLayout.SOUTH);
+		this.add(sidePanel, BorderLayout.EAST);
+	
+		this.pack();
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);
+
+	}
 	//startup prompt
 	public boolean askStart() {
-		System.out.println("Welcome to Deadwood!");
-		while (true) {
-			System.out.println("Are you ready to begin? (yes/no): ");
-			String input = scanner.nextLine().trim().toLowerCase();
+		this.buttonResponse = null;
+		this.promptLabel.setText("Ready to start the game?");
+		this.buttonPanel.removeAll();
 
-			if (input.equals("yes") || input.equals("y")) {
-				return true;
-			} else if(input.equals("no") || input.equals("n")) {
-				return false;
-			} else {
-				System.out.println("INVALID INPUT PLEASE TYPE 'YES' or 'NO'.");
+		JButton yesButton = new JButton("Yes");
+		JButton noButton = new JButton("No");
+
+		yesButton.addActionListener(e -> {
+			this.buttonResponse = true;
+		});
+		noButton.addActionListener(e -> {
+			showMessage("Well... We don't need you anyway. Bye!");
+			System.exit(0);
+		});
+
+		this.buttonPanel.add(yesButton);
+		this.buttonPanel.add(noButton);
+
+		refreshActionPanel();
+
+		while (this.buttonResponse == null) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
-	}
-	
+		return this.buttonResponse;
+	}	
 	public void printFullBoard(Board board) {
-		System.out.println("______CURRENT BOARD_____");
+		showMessage("______CURRENT BOARD_____");
 		
 		for (Room room : board.getAllRooms()) {
 			if(room instanceof Set ) {
 				Set set = (Set) room;
 				if(set.getActiveCard() != null) {
-					System.out.println("Room: " + room.getName() + " Shot Count: " + set.getShotCount() + " Budget: " + set.getActiveCard().getBudget());
-					System.out.println(" Adjacent to: " + room.getAdjacent());
+					showMessage("Room: " + room.getName() + " Shot Count: " + set.getShotCount() + " Budget: " + set.getActiveCard().getBudget());
+					showMessage(" Adjacent to: " + room.getAdjacent());
 		            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
 		                System.out.print(" Players in room: ");
 		                for (Player player : room.getPlayers()) {
 		                    System.out.print(player.getName() + ", ");
 		                }
-		                System.out.println();
+		                showMessage("");
 		            }
 	            } else {
-	            	System.out.println("Room: " + room.getName() + ". The card is flipped and the scene is closed currently.");
-					System.out.println(" Adjacent to: " + room.getAdjacent());
+	            	showMessage("Room: " + room.getName() + ". The card is flipped and the scene is closed currently.");
+					showMessage(" Adjacent to: " + room.getAdjacent());
 		            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
 		                System.out.print(" Players in room: ");
 		                for (Player player : room.getPlayers()) {
 		                    System.out.print(player.getName() + ", ");
 		                }
-		                System.out.println();
+		                showMessage("");
 		            }
 	            	
 	            }
 	        } else {
-	        	System.out.println("Room: " + room.getName());
-				System.out.println(" Adjacent to: " + room.getAdjacent());
+	        	showMessage("Room: " + room.getName());
+				showMessage(" Adjacent to: " + room.getAdjacent());
 	            if (room.getPlayers() != null && !room.getPlayers().isEmpty()) {
 	                System.out.print(" Players in room: ");
 	                for (Player player : room.getPlayers()) {
 	                    System.out.print(player.getName() + ", ");
 	                }
-	                System.out.println();
+	                showMessage("");
 	            }
 	        }
             
 		}
-	System.out.println("__________________");
+	showMessage("__________________");
     }
+
 	public void showMessage(String message) {
-		System.out.println(message);
+		this.gameLog.append(message + "\n");
+		this.gameLog.setCaretPosition(this.gameLog.getDocument().getLength());
+	}
+
+	public void refreshActionPanel() {
+		this.actionPanel.revalidate();
+		this.actionPanel.repaint();
 	}
 public List<String> getPlayerNames(){
     Boolean valid = false;
     List<String> names = new ArrayList<>();
     
     while (!valid) {
-    names.clear();
-    System.out.println("Enter player names, separated by commas (Up to 8 players):");
-    System.out.print("> ");
-        
-        // Grab entire line
-        String raw = scanner.nextLine();
-        
-        // Chop the string
-        String[] splitNames = raw.split(",");
-        
-        // Add names to the list
-        for (String name : splitNames) {
-            names.add(name.trim());
-        }
-        if (names.size() >= 2 && names.size() <= 8) {
-            valid = true;
-        } else {
-            System.out.println("Invalid number of players. Please enter between 2 and 8 players.");
-        }
-    }
-    return names;
-}
+		this.stringResponse = null;
+		this.promptLabel.setText("Enter player names separated by commas");
+		this.buttonPanel.removeAll();
+
+		JTextField input = new JTextField(15);
+		JButton submitButton = new JButton("Submit");
+
+		submitButton.addActionListener(e -> {
+			this.stringResponse = input.getText();
+		});
+		input.addActionListener(e -> {
+			this.stringResponse = input.getText();
+		});
+
+		this.buttonPanel.add(input);
+		this.buttonPanel.add(submitButton);
+        refreshActionPanel();
+
+		//game pauses while waiting for input
+		while (this.stringResponse == null) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String raw = this.stringResponse;
+		String[] splitNames = raw.split(",");
+		for (String name : splitNames) {
+			name = name.trim();
+			if (!name.isEmpty()) {
+				names.add(name.trim());
+			}
+		}
+		if (names.size() >= 2 && names.size() <= 8) {
+			valid = true;
+		} else {
+			showMessage("ERROR: PLEASE FOLLOW THE INSTRUCTIONS AND ENTER BETWEEN 2 AND 8 NAMES SEPARATED BY COMMAS");
+			names.clear();
+		}
+	}
+	return names;
+	}
+	
 public void printAvailableRoles(Set destination) {
     showMessage("\nAvailable roles at " + destination.getName() + ":");
     boolean foundRoles = false;
@@ -127,13 +227,13 @@ public void render(Packet packet) {
     
     switch (packet.getLastEvent()) {
     case TURN_START:
-    	System.out.println("Hey " + packet.getPlayer().getName() + "! You're on now!" );
-    	System.out.println("Current player: " + packet.getPlayer().getName());
-    	System.out.println("Location: " + packet.getLocation().getName());
-        System.out.println("Money: " + packet.getPlayer().getMoney() + ", Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
+    	showMessage("Hey " + packet.getPlayer().getName() + "! You're on now!" );
+    	showMessage("Current player: " + packet.getPlayer().getName());
+    	showMessage("Location: " + packet.getLocation().getName());
+        showMessage("Money: " + packet.getPlayer().getMoney() + ", Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
     	break; 	
     case INVALID_ACTION:
-    	System.out.println("Invalid action... Don't do that again...");
+    	showMessage("Invalid action... Don't do that again...");
     	break;
     case MOVED:
     	String roomName = packet.getLastLocation().getName();
@@ -141,56 +241,56 @@ public void render(Packet packet) {
     	if(packet.getLocation() instanceof Set) {
     		Set set = (Set) packet.getLocation();
     		if(set.getActiveCard() != null)
-    			System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ", Budget: " + set.getActiveCard().getBudget());
+    			showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ", Budget: " + set.getActiveCard().getBudget());
     		else {
-    			System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ". The card is flipped and the scene is closed currently.");	
+    			showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ". The card is flipped and the scene is closed currently.");	
     		}
     	} else {
-    		System.out.println("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName());
+    		showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName());
     		
     	}
     	break;
     case SCENE_REVEALED:
-    	System.out.println(packet.getTargetLocation().getName() + " is the new scene!");
+    	showMessage(packet.getTargetLocation().getName() + " is the new scene!");
     	break;	
     case ACT_SUCCESS:
-    	System.out.println("Winner winner chicken dinner!");
-    	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	showMessage("Winner winner chicken dinner!");
+    	showMessage("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	Set set = (Set) packet.getLocation();
-    	System.out.println("Shots left:" + set.getShotCount());
+    	showMessage("Shots left:" + set.getShotCount());
     	
     case REHEARSED:
-    	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	showMessage("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	break;
     case ACT_FAIL:
-    	System.out.println("You're a loser and you failed.");
-    	System.out.println("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	showMessage("You're a loser and you failed.");
+    	showMessage("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	set = (Set) packet.getLocation();
-    	System.out.println("Shots left:" + set.getShotCount());
+    	showMessage("Shots left:" + set.getShotCount());
     	break;
     case QUERY_WORK:
-    	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
+    	showMessage("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	break;
     case SCENE_WRAPPED:
-    	System.out.println("The scene is over and you should leave...");
+    	showMessage("The scene is over and you should leave...");
     	break;
     case UPGRADED:
-    	System.out.println("Congrats you got a new rank, you upgraded to " + packet.getPlayer().getRank());
+    	showMessage("Congrats you got a new rank, you upgraded to " + packet.getPlayer().getRank());
     	break;
     case GAME_OVER:
-        System.out.println("\nGAME OVER: Final Standings");
+        showMessage("\nGAME OVER: Final Standings");
         List<Player> ranking = packet.getFinalRanking();
         List<Integer> scores = packet.getFinalScores();
         if (ranking != null && scores != null && ranking.size() == scores.size()) {
             for (int i = 0; i < ranking.size(); i++) {
                 Player p = ranking.get(i);
                 int s = scores.get(i);
-                System.out.println((i+1) + ". " + p.getName() + " - Score: " + s + " (Money:" + p.getMoney() + ", Credits:" + p.getCredits() + ", Rank:" + p.getRank() + ")");
+                showMessage((i+1) + ". " + p.getName() + " - Score: " + s + " (Money:" + p.getMoney() + ", Credits:" + p.getCredits() + ", Rank:" + p.getRank() + ")");
             }
         } else {
-            System.out.println("No final standings available.");
+            showMessage("No final standings available.");
         }
-        System.out.println("\n");
+        showMessage("\n");
     	break;
     default:
     	break;
@@ -199,19 +299,47 @@ public void render(Packet packet) {
 }
 public String renderAndRequestAction(Packet packet) {
     render(packet);
-    if (packet.getLastEvent() == Packet.EventType.QUERY_DESTINATION) {
-    	System.out.println("Alright, so where are you goin'? " + packet.getAvailableActions());
-    } else if(packet.getLastEvent() == Packet.EventType.QUERY_MOVE) {
-    	System.out.println("Are you sure? " + packet.getAvailableActions());
-    }else {
-    //showing options + requesting input
-    	System.out.println("What would you like to do?" + packet.getAvailableActions());
-    }
-    System.out.print("> ");
-    return this.scanner.nextLine();
+    
+	String promptMessage = "";
+	if (packet.getLastEvent() == Packet.EventType.QUERY_DESTINATION){
+		promptMessage = "Alright, so where are you goin'?";
+	} else if (packet.getLastEvent() == Packet.EventType.QUERY_MOVE){
+		promptMessage = "Are ya sure you want to move? (yes/no)";
+	} else{
+		promptMessage = "What do ya want to do? \n Options: " + packet.getAvailableActions();
+	} 
+
+	this.promptLabel.setText("<html><center>" + promptMessage + "</center></html>");
+	this.buttonPanel.removeAll();
+
+	this.stringResponse = null;
+	JTextField input = new JTextField(10);
+	JButton submitButton = new JButton("Submit");
+
+	submitButton.addActionListener(e -> {
+		this.stringResponse = input.getText();
+	});
+	input.addActionListener(e -> {
+		this.stringResponse = input.getText();
+	});
+	this.buttonPanel.add(input);
+	this.buttonPanel.add(submitButton);
+	refreshActionPanel();
+
+	//game pauses while waiting for input
+	while (this.stringResponse == null) {
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	return this.stringResponse.trim().toLowerCase();
 }
     public void exitMessage() {
-        System.out.println("You should leave...");
-        this.scanner.nextLine();
+        showMessage("You should leave...");
+        this.promptLabel.setText("Game's over! Thanks for playing!");
+		this.buttonPanel.removeAll();
+		refreshActionPanel();
     }
 }
