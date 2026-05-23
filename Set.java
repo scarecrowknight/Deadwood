@@ -1,3 +1,4 @@
+import java.awt.geom.Area;
 import java.util.*;
 public class Set extends Room {
 
@@ -7,6 +8,7 @@ public class Set extends Room {
 	also its size is the max number of roles for the scene */
 	private ArrayList<Role> roles = null;
 	private Card activeCard;
+	private ArrayList<Area> takePositions;
 	
    public Set(String name, Board board, int shotCount, ArrayList<Role> roles) {
 	   super(name, board);
@@ -14,8 +16,11 @@ public class Set extends Room {
 	   this.currentPlayers = new ArrayList<Player>(); //list of current players on set
 	   this.roles = roles; //containes the the "static roles" to be appended by parser
    }
-   
-   public Card getActiveCard() {
+
+	public void setTakePositions(ArrayList<Area> takePositions) {this.takePositions = takePositions;}
+	public ArrayList<Area> getTakePositions() {return this.takePositions;}
+
+	public Card getActiveCard() {
 	   return this.activeCard;
    }
    public void setActiveCard(Card activeCard) {

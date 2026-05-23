@@ -5,12 +5,18 @@ public class Room {
    private String name;
    private ArrayList<Room> adjacentRooms;
    private ArrayList<Player> players;
-   //private Card sceneCard 
-   
+   private Area area;
+
+
+
    public Room(String name, Board board){
       this.name = name;
       this.adjacentRooms = new ArrayList<Room>();
       this.players = new ArrayList<Player>();
+   }
+
+   public void updateArea(Area area){
+      this.area = area;
    }
    
    // alt constructor for if you know adj rooms already
@@ -42,5 +48,5 @@ public class Room {
    public ArrayList<Player> getPlayers() {
       return this.players;
    }
-
+   public Area getArea() {return this.area;}
 }

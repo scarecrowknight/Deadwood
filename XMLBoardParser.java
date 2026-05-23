@@ -29,37 +29,7 @@ public class XMLBoardParser extends XMLParser{
 
    }
    
-   private ArrayList<Role> parseParts(Node roomNode){
-      
-      String childName = "parts";
-      Node partsContainer = filterChild(roomNode, childName);
-      
-      childName = "part"; 
-      ArrayList<Node> parts = filterChildren(partsContainer, childName);
-      
-      ArrayList<Role> roles = new ArrayList<Role>();
-      
-      for (Node part: parts){
-      
-         NamedNodeMap attributes = part.getAttributes();
-      
-         String name = attributes.getNamedItem("name").getNodeValue();
-         int level = Integer.parseInt(attributes.getNamedItem("level").getNodeValue());
-         
-         childName = "line";
-         Node lineNode = filterChild(part, childName);
-         String quote = lineNode.getTextContent();
-         
-         Role role = new Role(name, quote, level, false, false);
-         
-         roles.add(role);
-         
-         }
-         
-      return roles;
-   }
 
-   
    private void parseTrailer(NodeList trailerNodeList, Board b){
       Node trailerNode = trailerNodeList.item(0);
       String name = "Trailer";
@@ -72,6 +42,12 @@ public class XMLBoardParser extends XMLParser{
       for (String neighbor: neighbors){
          b.addEdge(trailer, neighbor);
       }
+
+      String childName = "area";
+      Node areaNode = filterChild(trailerNode, childName);
+      Area area = parseArea(areaNode);
+      trailer.updateArea(area);
+
 
    }
    
@@ -88,6 +64,11 @@ public class XMLBoardParser extends XMLParser{
          b.addEdge(office, neighbor);
       }
 
+      String childName = "area";
+      Node areaNode = filterChild(officeNode, childName);
+      Area area = parseArea(areaNode);
+      office.updateArea(area);
+
       
 
       
@@ -101,7 +82,8 @@ public class XMLBoardParser extends XMLParser{
          
          String name = setNode.getAttributes().getNamedItem("name").getNodeValue();
 
-         int shotCount = parseTakes(setNode);
+         ArrayList<Area> takePositions = parseTakes(setNode);
+         int shotCount = takePositions.size();
          
          ArrayList<Role> roles = parseParts(setNode);
          //ivy continue from here and add budget in parser :)
@@ -114,21 +96,81 @@ public class XMLBoardParser extends XMLParser{
          for (String neighbor: neighbors){
             b.addEdge(set, neighbor);
          }
+
+         String childName = "area";
+         Node areaNode = filterChild(setNode, childName);
+         Area area = parseArea(areaNode);
+         set.updateArea(area);
+
       }
       
       return;
       
    
    }
-      
-   private int parseTakes(Node roomNode){
+
+   private ArrayList<Role> parseParts(Node roomNode){
+
+      String childName = "parts";
+      Node partsContainer = filterChild(roomNode, childName);
+
+      childName = "part";
+      ArrayList<Node> parts = filterChildren(partsContainer, childName);
+
+      ArrayList<Role> roles = new ArrayList<Role>();
+
+      for (Node part: parts){
+
+         NamedNodeMap attributes = part.getAttributes();
+
+         String name = attributes.getNamedItem("name").getNodeValue();
+         int level = Integer.parseInt(attributes.getNamedItem("level").getNodeValue());
+
+         childName = "line";
+         Node lineNode = filterChild(part, childName);
+         String quote = lineNode.getTextContent();
+
+         Role role = new Role(name, quote, level, false, false);
+
+         childName = "area";
+         Node areaNode = filterChild(part, childName);
+         Area area = parseArea(areaNode);
+
+         role.updateArea(area);
+
+         roles.add(role);
+
+      }
+
+      return roles;
+   }
+
+
+   private Area parseArea(Node areaNode){
+      NamedNodeMap areaMap = areaNode.getAttributes();
+      int[] areaArray = new int[4];
+      for (int i = 0; i < 4; i++) {
+         areaArray[i] = Integer.parseInt( areaMap.item(i).getNodeValue() );
+      }
+      Area area = new Area(areaArray);
+      return area;
+   }
+
+   private ArrayList<Area> parseTakes(Node roomNode){
       
       String childName = "takes";
       Node takesContainer = filterChild(roomNode, childName);
       
       childName = "take"; 
       ArrayList<Node> takes = filterChildren(takesContainer, childName);
-      return takes.size();
+      ArrayList<Area> takePositions = new ArrayList<Area>();
+      for(Node take : takes){
+         childName = "area";
+         Node areaNode = filterChild(take, childName);
+         Area area = parseArea(areaNode);
+         takePositions.add(area);
+      }
+      return takePositions;
       
    }
    
@@ -173,7 +215,6 @@ public class XMLBoardParser extends XMLParser{
          Document d = p.getDocFromFile(filename);
          p.readRooms(d, b);
          Room r = b.getRoom("Trailer");
-         System.out.println(r.getAdjacent());
       } catch(Exception e) {
          System.out.println(":c");
          e.printStackTrace();
