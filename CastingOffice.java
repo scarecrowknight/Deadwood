@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class CastingOffice extends Room {
 	private int playerCredits;
 	private int playerDollars;
@@ -10,18 +12,29 @@ public class CastingOffice extends Room {
 		{28, 20},
 		{40, 25}
 };
+	ArrayList<Area> upgradeAreas;
 	public CastingOffice(String name, Board board, int playerRank, int playerCredits, int playerDollars, int desiredRank) {
 		super(name, board);
 		this.playerCredits = playerCredits;
 		this.playerDollars = playerDollars;
 		this.desiredRank = desiredRank;
 		this.playerRank =  playerRank;
+      this.upgradeAreas = new ArrayList<Area>();
 
 	}
 	public CastingOffice(String name, Board b) {
 		super(name, b);
+      this.upgradeAreas = new ArrayList<Area>();
 	}
-	
+
+	public void addUpgradeArea(Area area){
+		this.upgradeAreas.add(area);
+	}
+
+	public ArrayList<Area> getUpgradeAreas() {
+		return upgradeAreas;
+	}
+
 	public int dollarCost(int desiredRank) {
 		this.desiredRank = desiredRank;
 		return rankUpgradeCost[desiredRank - 2][0];

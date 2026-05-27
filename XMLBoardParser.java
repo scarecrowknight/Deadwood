@@ -43,8 +43,8 @@ public class XMLBoardParser extends XMLParser{
          b.addEdge(trailer, neighbor);
       }
 
-      String childName = "area";
-      Node areaNode = filterChild(trailerNode, childName);
+
+      Node areaNode = filterChild(trailerNode, "area");
       Area area = parseArea(areaNode);
       trailer.updateArea(area);
 
@@ -64,10 +64,25 @@ public class XMLBoardParser extends XMLParser{
          b.addEdge(office, neighbor);
       }
 
-      String childName = "area";
-      Node areaNode = filterChild(officeNode, childName);
+      //gets the office's position values
+      Node areaNode = filterChild(officeNode, "area");
       Area area = parseArea(areaNode);
       office.updateArea(area);
+
+      //gets position values of upgrades inside office and their prices.
+
+      Node upgradesNode = filterChild(officeNode, "upgrades");
+
+      ArrayList<Node> upgrades = filterChildren(upgradesNode, "upgrade");
+
+      for(Node upgrade : upgrades){
+         System.out.println(upgrade);
+         Node upgradeAreaNode = filterChild(upgrade, "area");
+         System.out.println(upgradeAreaNode);
+         area = parseArea(upgradeAreaNode);
+         office.addUpgradeArea(area);
+      }
+      System.out.println(office.getUpgradeAreas());
 
       
 
@@ -97,8 +112,7 @@ public class XMLBoardParser extends XMLParser{
             b.addEdge(set, neighbor);
          }
 
-         String childName = "area";
-         Node areaNode = filterChild(setNode, childName);
+         Node areaNode = filterChild(setNode, "area");
          Area area = parseArea(areaNode);
          set.updateArea(area);
 
@@ -111,11 +125,9 @@ public class XMLBoardParser extends XMLParser{
 
    private ArrayList<Role> parseParts(Node roomNode){
 
-      String childName = "parts";
-      Node partsContainer = filterChild(roomNode, childName);
+      Node partsContainer = filterChild(roomNode, "parts");
 
-      childName = "part";
-      ArrayList<Node> parts = filterChildren(partsContainer, childName);
+      ArrayList<Node> parts = filterChildren(partsContainer, "part");
 
       ArrayList<Role> roles = new ArrayList<Role>();
 
@@ -126,14 +138,12 @@ public class XMLBoardParser extends XMLParser{
          String name = attributes.getNamedItem("name").getNodeValue();
          int level = Integer.parseInt(attributes.getNamedItem("level").getNodeValue());
 
-         childName = "line";
-         Node lineNode = filterChild(part, childName);
+         Node lineNode = filterChild(part, "line");
          String quote = lineNode.getTextContent();
 
          Role role = new Role(name, quote, level, false, false);
 
-         childName = "area";
-         Node areaNode = filterChild(part, childName);
+         Node areaNode = filterChild(part, "area");
          Area area = parseArea(areaNode);
 
          role.updateArea(area);
@@ -157,16 +167,13 @@ public class XMLBoardParser extends XMLParser{
    }
 
    private ArrayList<Area> parseTakes(Node roomNode){
-      
-      String childName = "takes";
-      Node takesContainer = filterChild(roomNode, childName);
-      
-      childName = "take"; 
-      ArrayList<Node> takes = filterChildren(takesContainer, childName);
+
+      Node takesContainer = filterChild(roomNode, "takes");
+
+      ArrayList<Node> takes = filterChildren(takesContainer, "take");
       ArrayList<Area> takePositions = new ArrayList<Area>();
       for(Node take : takes){
-         childName = "area";
-         Node areaNode = filterChild(take, childName);
+         Node areaNode = filterChild(take, "area");
          Area area = parseArea(areaNode);
          takePositions.add(area);
       }
@@ -177,13 +184,11 @@ public class XMLBoardParser extends XMLParser{
    //set is passed in. Inside we extract the string array of neighbors
    private String[] parseNeighbors(Node roomNode){
       
-      
-      String childName = "neighbors";
-      Node neighborsContainer = filterChild(roomNode, childName);
+
+      Node neighborsContainer = filterChild(roomNode, "neighbors");
       //Above is a node contining a NodeList containing the neighbor nodes
       
-      childName = "neighbor"; 
-      ArrayList<Node> neighbors = filterChildren(neighborsContainer, childName);
+      ArrayList<Node> neighbors = filterChildren(neighborsContainer, "neighbor");
       //This is an ArrayList containing the neighbor nodes
       
       String[] neighborNames = getNeighborNames(neighbors);
