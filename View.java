@@ -24,15 +24,25 @@ public class View extends JFrame{
 		// Setup game board
 		this.boardPane = new JLayeredPane();
 		ImageIcon gameBoardImage = new ImageIcon("Images/board.jpg");
+
+		// Making the window smaller and scaling the board image to fit.
+		 Image scaledImage = gameBoardImage.getImage().getScaledInstance(800, 600, Image.SCALE_SMOOTH);
+	     gameBoardImage = new ImageIcon(scaledImage);
+
 		this.boardLabel = new JLabel(gameBoardImage);
 
 		//set size of the board
 		int width = gameBoardImage.getIconWidth();
 		int height = gameBoardImage.getIconHeight();
 
+		// Size of the board pane and position the board label
 		this.boardPane.setPreferredSize(new Dimension(width, height));
-		this.boardLabel.setBounds(0, 0, width, height);
+		this.boardLabel.setBounds(0, 0, width + 100, height + 50);
+		
+		// Shift the board label to the left and up to make room for the side panel
+		this.boardLabel.setLocation(-50, -25);
 
+		// Add the board label to the layered pane
 		this.boardPane.add(boardLabel, Integer.valueOf(0)); // Add board to the lowest layer
 		this.add(boardPane, BorderLayout.CENTER);
 
@@ -40,25 +50,39 @@ public class View extends JFrame{
 		this.gameLog = new JTextArea(10, 30);
 		this.gameLog.setEditable(false);
 		this.gameLog.setLineWrap(true);
+		this.gameLog.setWrapStyleWord(true);
 
+		// Wrap the game log in a scroll pane
 		JScrollPane scrollPane = new JScrollPane(this.gameLog);
 
+		//Side panel to hold game log and action panel
 		JPanel sidePanel = new JPanel(new BorderLayout());
 		sidePanel.add(new JLabel("Game Log"), BorderLayout.NORTH);
 		sidePanel.add(scrollPane, BorderLayout.CENTER);
+		sidePanel.setPreferredSize(new Dimension(300,10));
 
-		//setup action panel	
+		// Action panel for prompts and buttons
 		this.actionPanel = new JPanel();
 		this.promptLabel = new JLabel("Initializing...");
 		this.promptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
 
+		// Button panel to hold buttons for user input
 		this.buttonPanel = new JPanel(new FlowLayout());
 
+		// Add prompt and button panel to action panel
 		this.actionPanel.add(this.promptLabel);
 		this.actionPanel.add(this.buttonPanel);
 		sidePanel.add(this.actionPanel, BorderLayout.SOUTH);
 		this.add(sidePanel, BorderLayout.EAST);
-	
+		
+		//make sure prompts, action buttons, and text are not cut off
+		this.buttonPanel.setPreferredSize(new Dimension(280, 50));
+
+		// add some padding around action panel
+		this.actionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
+
+		//finalize...
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
@@ -75,6 +99,7 @@ public class View extends JFrame{
 
 		yesButton.addActionListener(e -> {
 			this.buttonResponse = true;
+			refreshActionPanel();
 		});
 		noButton.addActionListener(e -> {
 			showMessage("Well... We don't need you anyway. Bye!");
@@ -145,8 +170,8 @@ public class View extends JFrame{
 	}
 
 	public void refreshActionPanel() {
-		this.actionPanel.revalidate();
-		this.actionPanel.repaint();
+		this.revalidate();
+		this.repaint();
 	}
 public List<String> getPlayerNames(){
     Boolean valid = false;
@@ -306,7 +331,7 @@ public String renderAndRequestAction(Packet packet) {
 	} else if (packet.getLastEvent() == Packet.EventType.QUERY_MOVE){
 		promptMessage = "Are ya sure you want to move? (yes/no)";
 	} else{
-		promptMessage = "What do ya want to do? \n Options: " + packet.getAvailableActions();
+		promptMessage = "What do ya want to do? <br> Options: " + packet.getAvailableActions();
 	} 
 
 	this.promptLabel.setText("<html><center>" + promptMessage + "</center></html>");
