@@ -102,6 +102,7 @@ public class GameManager{
 
         // Announce Turn Start natively via DTO
         Packet startPacket = new Packet(currentPlayer, currentPlayer.currentLocation(), board, null, Packet.EventType.TURN_START);
+        startPacket.setAllPlayers(this.players);
         view.render(startPacket); 
 
         while (!turnComplete) {

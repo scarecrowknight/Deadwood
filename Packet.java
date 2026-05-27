@@ -33,6 +33,7 @@ public class Packet{
 
     //game info 
     private Player player;
+    private List<Player> allPlayers;
     private Room location;
     private Board board;
     private List<String> availableActions;
@@ -73,9 +74,14 @@ public class Packet{
         this.location = location;
         this.board = board;
         this.availableActions = availableActions;
+        this.allPlayers = allPlayers;
         this.lastEvent = lastEvent;
     }
     
+    public void setAllPlayers(List<Player> allPlayers) {
+    	this.allPlayers = allPlayers;
+    }
+
     public Packet(Player player, Room location, Room prevLocation, Board board, List<String> availableActions, EventType lastEvent) {
         this.player = player;
         this.location = location;
@@ -86,6 +92,7 @@ public class Packet{
     }
     
     //basic getters
+    public List<Player> getAllPlayers() { return allPlayers; }
     public Player getPlayer() { return player; }
     public Room getLocation() { return location; }
     public Board getBoard() { return board; }

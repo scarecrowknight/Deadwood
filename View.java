@@ -13,6 +13,10 @@ public class View extends JFrame{
 	private JLabel promptLabel;
 	private JPanel buttonPanel;
 	
+	private JPanel bottomWrapperPanel;
+	private JPanel radioPanel;
+	private ButtonGroup currentRadioGroup;
+
 	//tracking user input	
 	private volatile String stringResponse = null;
 	private volatile Boolean buttonResponse = null;
@@ -65,12 +69,8 @@ public class View extends JFrame{
 		this.actionPanel = new JPanel();
 		this.promptLabel = new JLabel("Initializing...");
 		this.promptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-
-		// Button panel to hold buttons for user input
 		this.buttonPanel = new JPanel(new FlowLayout());
 
-		// Add prompt and button panel to action panel
 		this.actionPanel.add(this.promptLabel);
 		this.actionPanel.add(this.buttonPanel);
 		sidePanel.add(this.actionPanel, BorderLayout.SOUTH);
@@ -81,6 +81,13 @@ public class View extends JFrame{
 
 		// add some padding around action panel
 		this.actionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
+
+		this.radioPanel = new JPanel(new FlowLayout());
+		this.bottomWrapperPanel = new JPanel();
+		this.bottomWrapperPanel.setLayout(new BoxLayout(this.bottomWrapperPanel, BoxLayout.Y_AXIS));
+		this.bottomWrapperPanel.add(this.radioPanel);
+		this.bottomWrapperPanel.add(this.actionPanel);
+		sidePanel.add(this.bottomWrapperPanel, BorderLayout.SOUTH);
 
 		//finalize...
 		this.pack();
@@ -252,6 +259,15 @@ public void render(Packet packet) {
     
     switch (packet.getLastEvent()) {
     case TURN_START:
+		List<Player> allPlayers = packet.getAllPlayers();
+		List<String> playerNames = new ArrayList<>();
+		if (allPlayers != null) {
+			for (Player p : allPlayers) {
+				playerNames.add(p.getName());
+			}
+		}
+		updatePlayerDisplay(packet.getPlayer().getName(), playerNames);
+
     	showMessage("Hey " + packet.getPlayer().getName() + "! You're on now!" );
     	showMessage("Current player: " + packet.getPlayer().getName());
     	showMessage("Location: " + packet.getLocation().getName());
@@ -357,6 +373,8 @@ public String renderAndRequestAction(Packet packet) {
 		this.buttonPanel.add(noButton);
 	} else{
 		promptMessage = "What do ya want to do?";
+
+		this.currentRadioGroup = new ButtonGroup();
 		for(String actions : packet.getAvailableActions()) {
 			if(!actions.equals("View Board")) {
 				JButton actionButton = new JButton(actions);
@@ -380,6 +398,21 @@ public String renderAndRequestAction(Packet packet) {
 		}
 	}
 	return this.stringResponse.trim().toLowerCase();
+}
+//Radio button method for current player
+public void updatePlayerDisplay(String currentPlayerName, List<String> playerNames) {
+	this.radioPanel.removeAll();
+	this.currentRadioGroup = new ButtonGroup();
+	for (String name : playerNames) {
+		JRadioButton playerButton = new JRadioButton(name);
+		playerButton.setEnabled(false);
+		if (name.equals(currentPlayerName)) {
+			playerButton.setSelected(true);
+		}
+		this.currentRadioGroup.add(playerButton);
+		this.radioPanel.add(playerButton);
+	}
+	refreshActionPanel();
 }
     public void exitMessage() {
         showMessage("You should leave...");
