@@ -358,11 +358,13 @@ public String renderAndRequestAction(Packet packet) {
 	} else{
 		promptMessage = "What do ya want to do?";
 		for(String actions : packet.getAvailableActions()) {
-			JButton actionButton = new JButton(actions);
-			actionButton.addActionListener(e -> {
-				this.stringResponse = actions;
-			});
-			this.buttonPanel.add(actionButton);
+			if(!actions.equals("View Board")) {
+				JButton actionButton = new JButton(actions);
+				actionButton.addActionListener(e -> {
+					this.stringResponse = actions;
+				});
+				this.buttonPanel.add(actionButton);
+			}
 		}
 	} 
 
