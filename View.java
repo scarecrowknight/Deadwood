@@ -324,33 +324,51 @@ public void render(Packet packet) {
 }
 public String renderAndRequestAction(Packet packet) {
     render(packet);
-    
+    this.buttonPanel.removeAll();
+	this.stringResponse = null;
 	String promptMessage = "";
 	if (packet.getLastEvent() == Packet.EventType.QUERY_DESTINATION){
 		promptMessage = "Alright, so where are you goin'?";
-	} else if (packet.getLastEvent() == Packet.EventType.QUERY_MOVE){
-		promptMessage = "Are ya sure you want to move? (yes/no)";
+		Room currentLocation = packet.getPlayer().currentLocation();
+
+		if (currentLocation != null && !currentLocation.getAdjacent().isEmpty()) {
+			for (Room r : currentLocation.getAdjacent()) {
+				JButton roomButton = new JButton(r.getName());
+				roomButton.addActionListener(e -> {
+					this.stringResponse = r.getName();
+				});
+				this.buttonPanel.add(roomButton);
+			}
+		}else{
+			showMessage("ERROR: I have no idea how you got here but you have no adjacent rooms to move to... Good job, now you're stuck.");
+		}
+	}else if (packet.getLastEvent() == Packet.EventType.QUERY_MOVE){
+		promptMessage = "Are ya sure you want to move?";
+		JButton yesButton = new JButton("Yes");
+		JButton noButton = new JButton("No");
+
+		yesButton.addActionListener(e -> {
+			this.stringResponse = "yes";
+		});
+		noButton.addActionListener(e -> {
+			this.stringResponse = "no";
+		});
+		this.buttonPanel.add(yesButton);
+		this.buttonPanel.add(noButton);
 	} else{
-		promptMessage = "What do ya want to do? <br> Options: " + packet.getAvailableActions();
+		promptMessage = "What do ya want to do?";
+		for(String actions : packet.getAvailableActions()) {
+			JButton actionButton = new JButton(actions);
+			actionButton.addActionListener(e -> {
+				this.stringResponse = actions;
+			});
+			this.buttonPanel.add(actionButton);
+		}
 	} 
 
 	this.promptLabel.setText("<html><center>" + promptMessage + "</center></html>");
-	this.buttonPanel.removeAll();
 
-	this.stringResponse = null;
-	JTextField input = new JTextField(10);
-	JButton submitButton = new JButton("Submit");
-
-	submitButton.addActionListener(e -> {
-		this.stringResponse = input.getText();
-	});
-	input.addActionListener(e -> {
-		this.stringResponse = input.getText();
-	});
-	this.buttonPanel.add(input);
-	this.buttonPanel.add(submitButton);
 	refreshActionPanel();
-
 	//game pauses while waiting for input
 	while (this.stringResponse == null) {
 		try {
