@@ -5,9 +5,7 @@ public class Role {
     private int rank;
     private boolean occupied = false; //default state false
     private boolean staringRole;
-
-    //area variables for gui
-    Area area;
+    private Area area;
 
     //private boolean reward type? or maybe private enum reward type with starting + extra? idk if reward increase is static, check later
     //edit to last idea, unsure if reward type/amount should even be handled here or if we should deal with somewhere else since it really isnt a part of the role as much as the room/location and what else is going on (i.e. where players are and what rolls they have)
@@ -20,13 +18,10 @@ public class Role {
         this.rank = rank;
         this.occupied = occupied;
         this.staringRole = staringRole;
-    }
+   }
 
-    public void updateArea(Area area){
-        this.area = area;
-
-    }
-	
+   public void setArea(Area area){this.area = area;}
+	public Area getArea(){return this.area;}
 	public String getName(){
         return name;
     }

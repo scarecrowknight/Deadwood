@@ -12,14 +12,14 @@ public class CastingOffice extends Room {
 		{28, 20},
 		{40, 25}
 };
-	ArrayList<Area> upgradeAreas;
+	private ArrayList<Area> upgradeAreas;
 	public CastingOffice(String name, Board board, int playerRank, int playerCredits, int playerDollars, int desiredRank) {
 		super(name, board);
 		this.playerCredits = playerCredits;
 		this.playerDollars = playerDollars;
 		this.desiredRank = desiredRank;
 		this.playerRank =  playerRank;
-      this.upgradeAreas = new ArrayList<Area>();
+      	this.upgradeAreas = new ArrayList<Area>();
 
 	}
 	public CastingOffice(String name, Board b) {

@@ -49,12 +49,16 @@ public class XMLCardParser extends XMLParser{
          String name = attributes.getNamedItem("name").getNodeValue();
          int level = Integer.parseInt(attributes.getNamedItem("level").getNodeValue());
          
-         childName = "line";
-         Node lineNode = filterChild(part, childName);
+
+         Node lineNode = filterChild(part, "line");
          String quote = lineNode.getTextContent();
+
+         Node areaNode = filterChild(part, "area");
+         Area area = new Area(areaNode);
+
          
          Role role = new Role(name, quote, level, false, true);
-         
+         role.setArea(area);
          roles.add(role);
          
          }

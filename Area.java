@@ -1,11 +1,28 @@
 import java.util.ArrayList;
+import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.NodeList;
 
 public class Area {
     int height;
     int width;
     int xPos;
     int yPos;
+    
+    
+    public Area(Node areaNode){
+      NamedNodeMap areaMap = areaNode.getAttributes();
+      int[] areaArray = new int[4];
+      for (int i = 0; i < 4; i++) {
+         areaArray[i] = Integer.parseInt( areaMap.item(i).getNodeValue() );
+      }
+      
+      this.height = areaArray[0];
+      this.width = areaArray[1];
+      this.xPos = areaArray[2];
+      this.yPos = areaArray[3];
 
+   }
 
     public Area(int[] area){
         this.height = area[0];

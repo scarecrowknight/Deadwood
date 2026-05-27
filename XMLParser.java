@@ -16,7 +16,7 @@ import java.util.*;
 
 
 
-public class XMLParser{
+public abstract class XMLParser{
    
    public Document getDocFromFile(String filename)
    throws ParserConfigurationException{
@@ -66,6 +66,5 @@ public class XMLParser{
       
       return neighbors;
    }
-   
       
 }

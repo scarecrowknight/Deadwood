@@ -45,7 +45,7 @@ public class XMLBoardParser extends XMLParser{
 
 
       Node areaNode = filterChild(trailerNode, "area");
-      Area area = parseArea(areaNode);
+      Area area = new Area(areaNode);
       trailer.updateArea(area);
 
 
@@ -66,7 +66,7 @@ public class XMLBoardParser extends XMLParser{
 
       //gets the office's position values
       Node areaNode = filterChild(officeNode, "area");
-      Area area = parseArea(areaNode);
+      Area area = new Area(areaNode);
       office.updateArea(area);
 
       //gets position values of upgrades inside office and their prices.
@@ -76,13 +76,10 @@ public class XMLBoardParser extends XMLParser{
       ArrayList<Node> upgrades = filterChildren(upgradesNode, "upgrade");
 
       for(Node upgrade : upgrades){
-         System.out.println(upgrade);
          Node upgradeAreaNode = filterChild(upgrade, "area");
-         System.out.println(upgradeAreaNode);
-         area = parseArea(upgradeAreaNode);
+         area = new Area(upgradeAreaNode);
          office.addUpgradeArea(area);
       }
-      System.out.println(office.getUpgradeAreas());
 
       
 
@@ -113,7 +110,7 @@ public class XMLBoardParser extends XMLParser{
          }
 
          Node areaNode = filterChild(setNode, "area");
-         Area area = parseArea(areaNode);
+         Area area = new Area(areaNode);
          set.updateArea(area);
 
       }
@@ -144,9 +141,9 @@ public class XMLBoardParser extends XMLParser{
          Role role = new Role(name, quote, level, false, false);
 
          Node areaNode = filterChild(part, "area");
-         Area area = parseArea(areaNode);
+         Area area = new Area(areaNode);
 
-         role.updateArea(area);
+         role.setArea(area);
 
          roles.add(role);
 
@@ -156,15 +153,7 @@ public class XMLBoardParser extends XMLParser{
    }
 
 
-   private Area parseArea(Node areaNode){
-      NamedNodeMap areaMap = areaNode.getAttributes();
-      int[] areaArray = new int[4];
-      for (int i = 0; i < 4; i++) {
-         areaArray[i] = Integer.parseInt( areaMap.item(i).getNodeValue() );
-      }
-      Area area = new Area(areaArray);
-      return area;
-   }
+
 
    private ArrayList<Area> parseTakes(Node roomNode){
 
@@ -174,7 +163,7 @@ public class XMLBoardParser extends XMLParser{
       ArrayList<Area> takePositions = new ArrayList<Area>();
       for(Node take : takes){
          Node areaNode = filterChild(take, "area");
-         Area area = parseArea(areaNode);
+         Area area = new Area(areaNode);
          takePositions.add(area);
       }
       return takePositions;
