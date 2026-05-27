@@ -54,10 +54,11 @@ public class TakeRoleManager {
                 //find the role they typed
                 Role chosenR = null;
                 for (Role r : availableRoles) {
-                	if (r.getName().equalsIgnoreCase(roleChoice)) {
-                		chosenR = r;
-                		break;
-                	}
+                        String expectedButtonText = r.getName() + " (Req. Rank " + r.getRank() + ")";
+                		if (expectedButtonText.equalsIgnoreCase(roleChoice)) {
+                            chosenR = r;
+                            break;
+                    }
                 }
                 
                 if(chosenR != null) {

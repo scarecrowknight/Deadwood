@@ -77,7 +77,7 @@ public class View extends JFrame{
 		this.add(sidePanel, BorderLayout.EAST);
 		
 		//make sure prompts, action buttons, and text are not cut off
-		this.buttonPanel.setPreferredSize(new Dimension(280, 50));
+		this.buttonPanel.setPreferredSize(new Dimension(280, 120));
 
 		// add some padding around action panel
 		this.actionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
