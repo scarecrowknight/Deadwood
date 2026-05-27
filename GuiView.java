@@ -3,12 +3,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class GuiView extends JFrame{
+public class GuiView{
 
 	private JLayeredPane boardPane;
 	private JLabel boardLabel;
 	private JTextArea gameLog;
 
+	private JFrame frame;
 	private JPanel actionPanel;
 	private JLabel promptLabel;
 	private JPanel buttonPanel;
@@ -22,10 +23,14 @@ public class GuiView extends JFrame{
 	private volatile Boolean buttonResponse = null;
 
 	public GuiView(){
-		this.setLayout(new BorderLayout());
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Setup game board
+		this.frame = new JFrame("Deadwood");
+		this.frame.setLayout(new BorderLayout());
+		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ImageIcon icon = new ImageIcon("Images\\deadwood_icon.png");
+		this.frame.setIconImage(icon.getImage());
+		
 		this.boardPane = new JLayeredPane();
 		ImageIcon gameBoardImage = new ImageIcon("Images/board.jpg");
 
@@ -48,7 +53,7 @@ public class GuiView extends JFrame{
 
 		// Add the board label to the layered pane
 		this.boardPane.add(boardLabel, Integer.valueOf(0)); // Add board to the lowest layer
-		this.add(boardPane, BorderLayout.CENTER);
+		this.frame.add(boardPane, BorderLayout.CENTER);
 
 		// Setup game log
 		this.gameLog = new JTextArea(10, 30);
@@ -74,7 +79,7 @@ public class GuiView extends JFrame{
 		this.actionPanel.add(this.promptLabel);
 		this.actionPanel.add(this.buttonPanel);
 		sidePanel.add(this.actionPanel, BorderLayout.SOUTH);
-		this.add(sidePanel, BorderLayout.EAST);
+		this.frame.add(sidePanel, BorderLayout.EAST);
 		
 		//make sure prompts, action buttons, and text are not cut off
 		this.buttonPanel.setPreferredSize(new Dimension(280, 120));
@@ -91,9 +96,9 @@ public class GuiView extends JFrame{
 		sidePanel.add(this.bottomWrapperPanel, BorderLayout.SOUTH);
 
 		//finalize...
-		this.pack();
-		this.setLocationRelativeTo(null);
-		this.setVisible(true);
+		this.frame.pack();
+		this.frame.setLocationRelativeTo(null);
+		this.frame.setVisible(true);
 
 	}
 	//startup prompt
@@ -178,8 +183,8 @@ public class GuiView extends JFrame{
 	}
 
 	public void refreshActionPanel() {
-		this.revalidate();
-		this.repaint();
+		this.frame.revalidate();
+		this.frame.repaint();
 	}
 public List<String> getPlayerNames(){
     Boolean valid = false;
