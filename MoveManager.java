@@ -3,9 +3,9 @@ import java.util.List;
 
 public class MoveManager {
     private Board board;
-    private View view;
+    private GuiView view;
 
-    public MoveManager(Board board, View view) {
+    public MoveManager(Board board, GuiView view) {
         this.board = board;
         this.view = view;
     }

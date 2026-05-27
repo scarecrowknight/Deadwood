@@ -53,7 +53,7 @@ public class DeadWood {
     	Board gameBoard = gameSetup.getBoard();
     
     	//(View)
-    	View gameView = new View();
+    	GuiView gameView = new GuiView();
     	
     	//(Controller) 
     	boolean playerIsReady = gameView.askStart();

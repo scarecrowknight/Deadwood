@@ -2,13 +2,13 @@ import java.util.*;
 
 public class GameManager{
     private List<Player> players = new ArrayList<>();
-    private View view;
+    private GuiView view;
     private Board board;
     private int days = 4;
     private int currentDay = 1;
     private SceneDeck sceneDeck = new SceneDeck();
     
-	public GameManager(Board board, View view) {
+	public GameManager(Board board, GuiView view) {
     	this.board = board;
     	this.view = view;
     }

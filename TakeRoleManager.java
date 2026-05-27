@@ -3,9 +3,9 @@ import java.util.List;
 
 public class TakeRoleManager {
     private Board board;
-    private View view;
+    private GuiView view;
 
-    public TakeRoleManager(Board board, View view) {
+    public TakeRoleManager(Board board, GuiView view) {
         this.board = board;
         this.view = view;
     }

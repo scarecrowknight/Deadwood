@@ -4,11 +4,11 @@ import java.util.List;
 
 public class WorkManager {
     private Board board;
-    private View view;
+    private GuiView view;
     private List<Player> allPlayers; // Add this
 
     // Update constructor to take the player list
-    public WorkManager(Board board, View view, List<Player> allPlayers) {
+    public WorkManager(Board board, GuiView view, List<Player> allPlayers) {
         this.board = board;
         this.view = view;
         this.allPlayers = allPlayers;

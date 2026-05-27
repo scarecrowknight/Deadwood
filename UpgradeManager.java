@@ -3,9 +3,9 @@ import java.util.List;
 
 public class UpgradeManager {
     private Board board;
-    private View view;
+    private GuiView view;
 
-    public UpgradeManager(Board board, View view) {
+    public UpgradeManager(Board board, GuiView view) {
         this.board = board;
         this.view = view;
     }
