@@ -41,4 +41,16 @@ public class Area {
 
         return area;
     }
+    public int getHeight() {
+        return this.height;
+    }
+    public int getWidth() {
+        return this.width;
+    }
+    public int getXPos() {
+        return this.xPos;
+    }
+    public int getYPos() {
+        return this.yPos;
+    }
 }
