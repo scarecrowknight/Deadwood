@@ -13,6 +13,10 @@ public class GuiView{
 	private JPanel actionPanel;
 	private JLabel promptLabel;
 	private JPanel buttonPanel;
+
+	private Map<Player, JLabel> playerIcons = new HashMap<>();
+	private double boardScaleX = 1.0;
+	private double boardScaleY = 1.0;
 	
 	private JPanel bottomWrapperPanel;
 	private JPanel radioPanel;
@@ -34,11 +38,19 @@ public class GuiView{
 		this.boardPane = new JLayeredPane();
 		ImageIcon gameBoardImage = new ImageIcon("Images/board.jpg");
 
-		// Making the window smaller and scaling the board image to fit.
-		Image scaledImage = gameBoardImage.getImage().getScaledInstance(800, 600, Image.SCALE_SMOOTH);
-	    gameBoardImage = new ImageIcon(scaledImage);
+	// Keep room coordinates aligned with the board image, even if scaled.
+	Image rawBoardImage = gameBoardImage.getImage();
+	int rawWidth = rawBoardImage.getWidth(null);
+	int rawHeight = rawBoardImage.getHeight(null);
+	if (rawWidth > 0 && rawHeight > 0) {
+		boardScaleX = 800.0 / rawWidth;
+		boardScaleY = 600.0 / rawHeight;
+	}
 
-		this.boardLabel = new JLabel(gameBoardImage);
+	// Making the window smaller and scaling the board image to fit.
+	Image scaledImage = rawBoardImage.getScaledInstance(800, 600, Image.SCALE_SMOOTH);
+	gameBoardImage = new ImageIcon(scaledImage);
+	this.boardLabel = new JLabel(gameBoardImage);
 
 		//set size of the board
 		int width = gameBoardImage.getIconWidth();
@@ -283,20 +295,28 @@ public void render(Packet packet) {
     	showMessage("Invalid action... Don't do that again...");
     	break;
     case MOVED:
-    	String roomName = packet.getLastLocation().getName();
-    	
-    	if(packet.getLocation() instanceof Set) {
-    		Set set = (Set) packet.getLocation();
-    		if(set.getActiveCard() != null)
-    			showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ", Budget: " + set.getActiveCard().getBudget());
-    		else {
-    			showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ". The card is flipped and the scene is closed currently.");	
-    		}
-    	} else {
-    		showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName());
-    		
-    	}
-    	break;
+        if (packet.getPlayer() != null && packet.getLastLocation() != null && packet.getLocation() != null && packet.getBoard() != null) {
+            List<Room> path = shortestPath(packet.getBoard(), packet.getLastLocation(), packet.getLocation());
+            if (path != null && path.size() > 1) {
+                registerPlayerIcon(packet.getPlayer(), packet.getLastLocation());
+                movePlayerAlongPath(packet.getPlayer(), path);
+            } else {
+                registerPlayerIcon(packet.getPlayer(), packet.getLocation());
+            }
+        }
+        String roomName = packet.getLastLocation().getName();
+        
+        if(packet.getLocation() instanceof Set) {
+            Set set = (Set) packet.getLocation();
+            if(set.getActiveCard() != null)
+                showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ", Budget: " + set.getActiveCard().getBudget());
+            else {
+                showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName() + ". The card is flipped and the scene is closed currently.");    
+            }
+        } else {
+            showMessage("Moved from: " + roomName + ", Moved to: " + packet.getTargetLocation().getName());
+        }
+        break;
     case SCENE_REVEALED:
     	showMessage(packet.getTargetLocation().getName() + " is the new scene!");
     	break;	
@@ -351,10 +371,10 @@ public String renderAndRequestAction(Packet packet) {
 	String promptMessage = "";
 	if (packet.getLastEvent() == Packet.EventType.QUERY_DESTINATION){
 		promptMessage = "Alright, so where are you goin'?";
-		Room currentLocation = packet.getPlayer().currentLocation();
+		List<Room> adjRooms = packet.getAdjacentRooms();
 
-		if (currentLocation != null && !currentLocation.getAdjacent().isEmpty()) {
-			for (Room r : currentLocation.getAdjacent()) {
+		if (adjRooms != null && !adjRooms.isEmpty()) {
+			for (Room r : adjRooms) {
 				JButton roomButton = new JButton(r.getName());
 				roomButton.addActionListener(e -> {
 					this.stringResponse = r.getName();
@@ -420,6 +440,121 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
 	}
 	refreshActionPanel();
 }
+
+    public void registerPlayerIcon(Player player, Room location) {
+        if (player == null || location == null) {
+            return;
+        }
+        if (!playerIcons.containsKey(player)) {
+            String labelText = player.getName();
+            JLabel token = new JLabel(labelText, SwingConstants.CENTER);
+            token.setOpaque(true);
+            token.setForeground(Color.WHITE);
+            token.setBackground(getPlayerColor(player.getUserNumber()));
+            token.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            token.setFont(token.getFont().deriveFont(Font.BOLD, 12f));
+            int width = Math.max(40, labelText.length() * 8);
+            token.setPreferredSize(new Dimension(width, 30));
+            token.setSize(width, 30);
+            playerIcons.put(player, token);
+            boardPane.add(token, Integer.valueOf(1));
+        }
+        movePlayerIcon(player, location);
+    }
+
+    public void movePlayerAlongPath(Player player, List<Room> path) {
+        if (player == null || path == null || path.size() < 2) {
+            return;
+        }
+        registerPlayerIcon(player, path.get(0));
+        for (int i = 1; i < path.size(); i++) {
+            Room nextRoom = path.get(i);
+            movePlayerIcon(player, nextRoom);
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    private List<Room> shortestPath(Board board, Room start, Room destination) {
+        if (board == null || start == null || destination == null) {
+            return null;
+        }
+
+        Queue<Room> queue = new LinkedList<>();
+        Map<Room, Room> previous = new HashMap<>();
+        java.util.Set<Room> visited = new HashSet<>();
+
+        queue.offer(start);
+        visited.add(start);
+
+        while (!queue.isEmpty()) {
+            Room current = queue.poll();
+            if (current == destination) {
+                break;
+            }
+            for (Room neighbor : current.getAdjacent()) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    previous.put(neighbor, current);
+                    queue.offer(neighbor);
+                }
+            }
+        }
+
+        if (!visited.contains(destination)) {
+            return null;
+        }
+
+        LinkedList<Room> path = new LinkedList<>();
+        Room step = destination;
+        while (step != null) {
+            path.addFirst(step);
+            step = previous.get(step);
+        }
+        return path;
+    }
+
+    private void movePlayerIcon(Player player, Room location) {
+        JLabel token = playerIcons.get(player);
+        if (token == null || location == null) {
+            return;
+        }
+        Point center = getRoomCenter(location);
+        int size = token.getWidth();
+        int x = center.x - (size / 2);
+        int y = center.y - (size / 2);
+        SwingUtilities.invokeLater(() -> {
+            token.setLocation(x, y);
+            boardPane.repaint();
+        });
+    }
+
+    private Point getRoomCenter(Room room) {
+        if (room == null || room.getArea() == null) {
+            return new Point(0, 0);
+        }
+        Area area = room.getArea();
+        int centerX = (int) Math.round((area.getXPos() + (area.getWidth() / 2.0)) * boardScaleX);
+        int centerY = (int) Math.round((area.getYPos() + (area.getHeight() / 2.0)) * boardScaleY);
+        return new Point(centerX + boardLabel.getX(), centerY + boardLabel.getY());
+    }
+
+    private Color getPlayerColor(int playerNumber) {
+        Color[] palette = new Color[] {
+            new Color(220, 20, 60),
+            new Color(34, 139, 34),
+            new Color(30, 144, 255),
+            new Color(255, 140, 0),
+            new Color(128, 0, 128),
+            new Color(0, 128, 128),
+            new Color(184, 134, 11),
+            new Color(199, 21, 133)
+        };
+        return palette[playerNumber % palette.length];
+    }
     public void exitMessage() {
         showMessage("You should leave...");
         this.promptLabel.setText("Game's over! Thanks for playing!");

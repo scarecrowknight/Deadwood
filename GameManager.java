@@ -33,6 +33,7 @@ public class GameManager{
     		Room trailer = board.getTrailer();
     		for (Player p : players) {
     			p.SetLocation(trailer);
+                view.registerPlayerIcon(p, trailer);
     		}
     		
     		// Deal Scene Cards to sets
