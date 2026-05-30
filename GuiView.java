@@ -295,14 +295,8 @@ public void render(Packet packet) {
     	showMessage("Invalid action... Don't do that again...");
     	break;
     case MOVED:
-        if (packet.getPlayer() != null && packet.getLastLocation() != null && packet.getLocation() != null && packet.getBoard() != null) {
-            List<Room> path = shortestPath(packet.getBoard(), packet.getLastLocation(), packet.getLocation());
-            if (path != null && path.size() > 1) {
-                registerPlayerIcon(packet.getPlayer(), packet.getLastLocation());
-                movePlayerAlongPath(packet.getPlayer(), path);
-            } else {
-                registerPlayerIcon(packet.getPlayer(), packet.getLocation());
-            }
+        if (packet.getPlayer() != null && packet.getLocation() != null) {
+            registerPlayerIcon(packet.getPlayer(), packet.getLocation());
         }
         String roomName = packet.getLastLocation().getName();
         
@@ -446,23 +440,44 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             return;
         }
         if (!playerIcons.containsKey(player)) {
-            String labelText = player.getName();
+            String rawName = player.getName();
+            if (rawName == null) {
+                rawName = "";
+            }
+            rawName = rawName.trim().replaceAll("\\s+", " ");
+            if (rawName.length() > 14) {
+                rawName = rawName.substring(0, 14).trim();
+            }
+            String labelText;
+            if (rawName.contains(" ")) {
+                int splitIndex = rawName.indexOf(' ');
+                String firstLine = rawName.substring(0, splitIndex);
+                String secondLine = rawName.substring(splitIndex + 1);
+                labelText = "<html><div style='text-align:center; margin:0px; padding:0px;'>" + firstLine + "<br>" + secondLine + "</div></html>";
+            } else {
+                labelText = rawName;
+            }
+
             JLabel token = new JLabel(labelText, SwingConstants.CENTER);
             token.setOpaque(true);
             token.setForeground(Color.WHITE);
             token.setBackground(getPlayerColor(player.getUserNumber()));
             token.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
             token.setFont(token.getFont().deriveFont(Font.BOLD, 12f));
-            int width = Math.max(40, labelText.length() * 8);
-            token.setPreferredSize(new Dimension(width, 30));
-            token.setSize(width, 30);
+            token.setHorizontalAlignment(SwingConstants.CENTER);
+            token.setVerticalAlignment(SwingConstants.CENTER);
+            int fixedSize = 40;
+            token.setPreferredSize(new Dimension(fixedSize, fixedSize));
+            token.setMinimumSize(new Dimension(fixedSize, fixedSize));
+            token.setMaximumSize(new Dimension(fixedSize, fixedSize));
+            token.setSize(fixedSize, fixedSize);
             playerIcons.put(player, token);
             boardPane.add(token, Integer.valueOf(1));
         }
         movePlayerIcon(player, location);
     }
 
-    public void movePlayerAlongPath(Player player, List<Room> path) {
+    /*public void movePlayerAlongPath(Player player, List<Room> path) {
         if (player == null || path == null || path.size() < 2) {
             return;
         }
@@ -477,8 +492,9 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             }
         }
     }
+*/
 
-    private List<Room> shortestPath(Board board, Room start, Room destination) {
+    /*private List<Room> shortestPath(Board board, Room start, Room destination) {
         if (board == null || start == null || destination == null) {
             return null;
         }
@@ -516,7 +532,7 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
         }
         return path;
     }
-
+*/
     private void movePlayerIcon(Player player, Room location) {
         JLabel token = playerIcons.get(player);
         if (token == null || location == null) {
