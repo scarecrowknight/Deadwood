@@ -448,13 +448,17 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             if (rawName.length() > 14) {
                 rawName = rawName.substring(0, 14).trim();
             }
+
             String labelText;
+            String[] lines;
             if (rawName.contains(" ")) {
                 int splitIndex = rawName.indexOf(' ');
                 String firstLine = rawName.substring(0, splitIndex);
                 String secondLine = rawName.substring(splitIndex + 1);
+                lines = new String[] { firstLine, secondLine };
                 labelText = "<html><div style='text-align:center; margin:0px; padding:0px;'>" + firstLine + "<br>" + secondLine + "</div></html>";
             } else {
+                lines = new String[] { rawName };
                 labelText = rawName;
             }
 
@@ -463,10 +467,33 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             token.setForeground(Color.WHITE);
             token.setBackground(getPlayerColor(player.getUserNumber()));
             token.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-            token.setFont(token.getFont().deriveFont(Font.BOLD, 12f));
             token.setHorizontalAlignment(SwingConstants.CENTER);
             token.setVerticalAlignment(SwingConstants.CENTER);
+
             int fixedSize = 40;
+            float fontSize = 14f;
+            Font font = token.getFont().deriveFont(Font.BOLD, fontSize);
+            token.setFont(font);
+
+            int padding = 2;
+            FontMetrics fm = token.getFontMetrics(font);
+            int maxLineWidth = 0;
+            for (String line : lines) {
+                maxLineWidth = Math.max(maxLineWidth, fm.stringWidth(line));
+            }
+            int totalHeight = fm.getHeight() * lines.length;
+            while (maxLineWidth + padding * 2 > fixedSize || totalHeight + padding * 2 > fixedSize) {
+                fontSize -= 0.5f;
+                font = font.deriveFont(Font.BOLD, fontSize);
+                token.setFont(font);
+                fm = token.getFontMetrics(font);
+                maxLineWidth = 0;
+                for (String line : lines) {
+                    maxLineWidth = Math.max(maxLineWidth, fm.stringWidth(line));
+                }
+                totalHeight = fm.getHeight() * lines.length;
+            }
+
             token.setPreferredSize(new Dimension(fixedSize, fixedSize));
             token.setMinimumSize(new Dimension(fixedSize, fixedSize));
             token.setMaximumSize(new Dimension(fixedSize, fixedSize));
