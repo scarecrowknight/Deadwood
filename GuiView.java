@@ -471,7 +471,7 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             token.setVerticalAlignment(SwingConstants.CENTER);
 
             int fixedSize = 40;
-            float fontSize = 14f;
+            float fontSize = 30f;
             Font font = token.getFont().deriveFont(Font.BOLD, fontSize);
             token.setFont(font);
 
