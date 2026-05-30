@@ -500,6 +500,12 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             token.setSize(fixedSize, fixedSize);
             playerIcons.put(player, token);
             boardPane.add(token, Integer.valueOf(1));
+            Point center = getRoomCenter(location);
+            int x = center.x - (fixedSize / 2);
+            int y = center.y - (fixedSize / 2);
+            token.setLocation(x, y);
+            boardPane.repaint();
+            return;
         }
         movePlayerIcon(player, location);
     }
@@ -567,12 +573,51 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
         }
         Point center = getRoomCenter(location);
         int size = token.getWidth();
-        int x = center.x - (size / 2);
-        int y = center.y - (size / 2);
-        SwingUtilities.invokeLater(() -> {
-            token.setLocation(x, y);
+        int targetX = center.x - (size / 2);
+        int targetY = center.y - (size / 2);
+        SwingUtilities.invokeLater(() -> animateTokenTo(token, targetX, targetY));
+    }
+
+    private void animateTokenTo(JLabel token, int targetX, int targetY) {
+        Object existingTimer = token.getClientProperty("moveTimer");
+        if (existingTimer instanceof javax.swing.Timer) {
+            ((javax.swing.Timer) existingTimer).stop();
+        }
+
+        Point startLocation = token.getLocation();
+        int startX = startLocation.x;
+        int startY = startLocation.y;
+        int deltaX = targetX - startX;
+        int deltaY = targetY - startY;
+        if (deltaX == 0 && deltaY == 0) {
+            return;
+        }
+
+        int maxDistance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
+        int steps = Math.max(6, Math.min(30, maxDistance / 4));
+        final int totalSteps = steps;
+        final int delayMs = 30;
+        final double logDenominator = Math.log1p(9.0);
+        final int[] currentStep = {0};
+
+        javax.swing.Timer timer = new javax.swing.Timer(delayMs, e -> {
+            currentStep[0]++;
+            if (currentStep[0] >= totalSteps) {
+                token.setLocation(targetX, targetY);
+                ((javax.swing.Timer) e.getSource()).stop();
+                token.putClientProperty("moveTimer", null);
+            } else {
+                double t = currentStep[0] / (double) totalSteps;
+                double eased = Math.log1p(t * 9.0) / logDenominator;
+                int nextX = startX + (int) Math.round(deltaX * eased);
+                int nextY = startY + (int) Math.round(deltaY * eased);
+                token.setLocation(nextX, nextY);
+            }
             boardPane.repaint();
         });
+
+        token.putClientProperty("moveTimer", timer);
+        timer.start();
     }
 
     private Point getRoomCenter(Room room) {
