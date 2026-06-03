@@ -101,6 +101,9 @@ public class GuiView{
 		
 		// Radio buttons for current player display
 		this.radioPanel = new JPanel(new FlowLayout());
+		this.radioPanel.setBorder(BorderFactory.createEmptyBorder(30, 10, 30, 10));
+
+		// Wrapper panel to hold both radio buttons and action buttons
 		this.bottomWrapperPanel = new JPanel();
 		this.bottomWrapperPanel.setLayout(new BoxLayout(this.bottomWrapperPanel, BoxLayout.Y_AXIS));
 		this.bottomWrapperPanel.add(this.radioPanel);
@@ -204,11 +207,12 @@ public List<String> getPlayerNames(){
     
     while (!valid) {
 		this.stringResponse = null;
-		this.promptLabel.setText("Enter player names separated by commas");
+		//makes text smaller
+		this.promptLabel.setText("<html>Enter player names, limit 12 characters.<br>  separated by commas (Up to 8 players):</html>");
 		this.buttonPanel.removeAll();
 
 		JTextField input = new JTextField(15);
-		JButton submitButton = new JButton("Submit");
+		JButton submitButton = new JButton("Play");
 
 		submitButton.addActionListener(e -> {
 			this.stringResponse = input.getText();
@@ -233,6 +237,10 @@ public List<String> getPlayerNames(){
 		String raw = this.stringResponse;
 		String[] splitNames = raw.split(",");
 		for (String name : splitNames) {
+			if(name.trim().length() > 12) {
+				showMessage("Name '" + name.trim() + "' is too long. Please enter names with 5 characters or fewer.");
+				return getPlayerNames(); 
+			}
 			name = name.trim();
 			if (!name.isEmpty()) {
 				names.add(name.trim());
@@ -244,6 +252,11 @@ public List<String> getPlayerNames(){
 			showMessage("ERROR: PLEASE FOLLOW THE INSTRUCTIONS AND ENTER BETWEEN 2 AND 8 NAMES SEPARATED BY COMMAS");
 			names.clear();
 		}
+	}
+	//make the radio panel bigger if too many players so it doesn't cut off the names
+	if(names.size() > 4) {
+		this.radioPanel.setPreferredSize(new Dimension(280, 20 * names.size()));
+		refreshActionPanel();
 	}
 	return names;
 	}
@@ -366,7 +379,6 @@ public String renderAndRequestAction(Packet packet) {
 	if (packet.getLastEvent() == Packet.EventType.QUERY_DESTINATION){
 		promptMessage = "Alright, so where are you goin'?";
 		List<Room> adjRooms = packet.getAdjacentRooms();
-
 		if (adjRooms != null && !adjRooms.isEmpty()) {
 			for (Room r : adjRooms) {
 				JButton roomButton = new JButton(r.getName());
