@@ -21,7 +21,7 @@ public class GuiView{
 	private JPanel bottomWrapperPanel;
 	private JPanel radioPanel;
 	private ButtonGroup currentRadioGroup;
-	private Map<Room, JLabel> activeSceneIcons = new HashMap<>();
+	private Map<String, JLabel> activeSceneIcons = new HashMap<>();
 	private Map<Room, List<JLabel>> activeShotIcons = new HashMap<>();
 
 	public void updateShotDisplay(Set set){
@@ -338,9 +338,8 @@ public void printAvailableRoles(Set destination) {
     }
 }
 
-private JLabel createCardLabel(Card card, Room room){
+private JLabel createCardLabel(Card card, Room room, boolean isRevealed) {
 	JLabel cardLabel = new JLabel();
-
 	//Scale Coordinats
 	int x = (int) Math.round(room.getArea().getXPos() * boardScaleX);
 	int y = (int) Math.round(room.getArea().getYPos() * boardScaleY);
@@ -348,7 +347,8 @@ private JLabel createCardLabel(Card card, Room room){
 	int height = (int) Math.round(room.getArea().height * boardScaleY);
 
 	cardLabel.setBounds(x, y, width, height);
-	ImageIcon originalIcon = new ImageIcon("Images/" + card.getImgFileName());
+	String imagePath = isRevealed ? ("Images/" + card.getImgFileName()) : "Images/Cardback.png";
+	ImageIcon originalIcon = new ImageIcon(imagePath);
 	if(originalIcon.getIconWidth() > 0 && originalIcon.getIconHeight() > 0) {
 		Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
 		cardLabel.setIcon(new ImageIcon(scaledImage));
@@ -387,9 +387,9 @@ public void render(Packet packet) {
 		boardPane.repaint();
 		break; 
 	case SCENE_DEALT:
-		JLabel cardLabel = createCardLabel(packet.getCurrentCard(), packet.getLocation());
+		JLabel cardLabel = createCardLabel(packet.getCurrentCard(), packet.getLocation(), false);
 		boardPane.add(cardLabel, Integer.valueOf(1));
-		activeSceneIcons.put(packet.getLocation(), cardLabel);
+		activeSceneIcons.put(packet.getLocation().getName(), cardLabel);
 		if(packet.getLocation() instanceof Set) {
 			updateShotDisplay((Set) packet.getLocation());
 		}
@@ -417,7 +417,26 @@ public void render(Packet packet) {
         }
         break;
     case SCENE_REVEALED:
-    	showMessage(packet.getTargetLocation().getName() + " is the new scene!");
+		Room room = packet.getTargetLocation();
+		Card card = packet.getCurrentCard();
+
+		JLabel revealedCardLabel = activeSceneIcons.get(room.getName());
+		if (revealedCardLabel == null) {
+			System.out.println("DEBUG: No card label found for room " + room.getName());
+		} else if(card != null) {
+			//calculate scaled dimensions for the card image
+			int width = (int) Math.round(room.getArea().getWidth() * boardScaleX);
+			int height = (int) Math.round(room.getArea().getHeight() * boardScaleY);
+			// Flip the image
+			ImageIcon originalIcon = new ImageIcon("Images/" + card.getImgFileName());
+			Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+			revealedCardLabel.setIcon(new ImageIcon(scaledImage));
+			//force gui to update 
+			boardPane.moveToFront(revealedCardLabel);
+			boardPane.revalidate();
+			boardPane.repaint();
+			System.out.println("DEBUG: Revealed card " + card.getName() + " in room " + room.getName());
+		}
     	break;	
     case ACT_SUCCESS:
     	showMessage("Winner winner chicken dinner!");
@@ -441,7 +460,7 @@ public void render(Packet packet) {
     case SCENE_WRAPPED:
     	showMessage("The scene is over and you should leave...");
 
-		JLabel wrappedCard = activeSceneIcons.remove(packet.getLocation());
+		JLabel wrappedCard = activeSceneIcons.remove(packet.getLocation().getName());
 		if(wrappedCard != null){
 			boardPane.remove(wrappedCard);
 			boardPane.revalidate();

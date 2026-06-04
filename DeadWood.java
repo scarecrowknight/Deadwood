@@ -48,7 +48,7 @@ public class DeadWood {
     }
     
     public static void main(String[] args) {
-        //(Model)
+      //(Model)
     	DeadWood gameSetup = new DeadWood();
     	Board gameBoard = gameSetup.getBoard();
     

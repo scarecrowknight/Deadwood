@@ -43,21 +43,18 @@ public class MoveManager {
         }
         // execute final move state updates
         player.SetLocation(destination);
-        Card cardToReveal = null;
-        // check if arrived at a set with an active scene card
-        if (destination instanceof Set) {
+        Packet moveConfirm = new Packet(player, destination, currentLoc, board, null, Packet.EventType.MOVED);
+        moveConfirm.setMoveData(destination, null); // no card data to reveal on move
+        view.render(moveConfirm); // announce move to view
+        if(destination instanceof  Set){
             Set destSet = (Set) destination;
-            if (destSet.getActiveCard() != null) {
-                cardToReveal = destSet.getActiveCard();
-                // if card has a setFaceUp(true) tracking method, invoke it natively here
-            }
+            Card activeCard = destSet.getActiveCard();
+            if(activeCard != null) {
+                Packet revealPacket = new Packet(player, destination, board, null, Packet.EventType.SCENE_REVEALED);
+                revealPacket.setMoveData(destination, activeCard);
+                view.render(revealPacket);
         }
-        // dispatch confirmed move packet to update UI summaries
-        Packet moveConfirm = new Packet(player, destination, currentLoc,  board, null, Packet.EventType.MOVED);
-        moveConfirm.setMoveData(destination, cardToReveal);
-        view.render(moveConfirm);
-        if (destination instanceof Set) {
-        	view.printAvailableRoles((Set) destination);
+        view.printAvailableRoles(destSet);
         }
         return true;
 	
