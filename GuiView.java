@@ -22,6 +22,57 @@ public class GuiView{
 	private JPanel radioPanel;
 	private ButtonGroup currentRadioGroup;
 	private Map<Room, JLabel> activeSceneIcons = new HashMap<>();
+	private Map<Room, List<JLabel>> activeShotIcons = new HashMap<>();
+
+	public void updateShotDisplay(Set set){
+		if (activeShotIcons.containsKey(set)) {
+			List<JLabel> shotIcons = activeShotIcons.get(set);
+			for (JLabel icon : shotIcons) {
+				boardPane.remove(icon);
+			}
+		}
+		List<JLabel> newShotIcons = new ArrayList<>();
+		int shotsLeft = set.getShotCount();
+		ArrayList<Area> takePositions = set.getTakePositions();
+		if (takePositions == null){
+			return;
+		}
+		for(int i = 0; i < shotsLeft; i++){
+			if(i >= takePositions.size()){
+				break;
+			}
+			Area takeArea = takePositions.get(i);
+
+			//scales the xml coords to match window
+			int x = (int) Math.round(takeArea.getXPos() * boardScaleX);
+			int y = (int) Math.round(takeArea.getYPos() * boardScaleY);
+			int width = (int) Math.round(takeArea.getWidth() * boardScaleX);
+			int height = (int) Math.round(takeArea.getHeight() * boardScaleY);
+
+			JLabel shotIcon = new JLabel(new ImageIcon("Images/shot.png"));
+			ImageIcon originalShotIcon = (ImageIcon) shotIcon.getIcon();
+
+			if(shotIcon.getIcon().getIconWidth()> 0 && shotIcon.getIcon().getIconHeight() > 0) {
+				Image scaledImage = originalShotIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+				shotIcon.setIcon(new ImageIcon(scaledImage));
+			} else {
+				shotIcon.setText("X");
+				shotIcon.setHorizontalAlignment(SwingConstants.CENTER);
+				shotIcon.setVerticalAlignment(SwingConstants.CENTER);
+				shotIcon.setOpaque(true);
+				shotIcon.setBackground(new Color(255, 0, 0, 200));
+				shotIcon.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			}
+			shotIcon.setBounds(x, y, width, height);
+
+			boardPane.add(shotIcon, Integer.valueOf(2));
+			newShotIcons.add(shotIcon);
+		}
+		activeShotIcons.put(set, newShotIcons);
+		boardPane.revalidate();
+		boardPane.repaint();
+			
+		}
 
 	//tracking user input	
 	private volatile String stringResponse = null;
@@ -286,6 +337,7 @@ public void printAvailableRoles(Set destination) {
         showMessage("  (No roles currently available here)");
     }
 }
+
 private JLabel createCardLabel(Card card, Room room){
 	JLabel cardLabel = new JLabel();
 
@@ -328,11 +380,19 @@ public void render(Packet packet) {
     	showMessage("Current player: " + packet.getPlayer().getName());
     	showMessage("Location: " + packet.getLocation().getName());
         showMessage("Money: " + packet.getPlayer().getMoney() + ", Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
-    	break; 
+		if(packet.getLocation() instanceof Set) {
+			updateShotDisplay((Set) packet.getLocation());
+		}
+		boardPane.revalidate();
+		boardPane.repaint();
+		break; 
 	case SCENE_DEALT:
 		JLabel cardLabel = createCardLabel(packet.getCurrentCard(), packet.getLocation());
 		boardPane.add(cardLabel, Integer.valueOf(1));
 		activeSceneIcons.put(packet.getLocation(), cardLabel);
+		if(packet.getLocation() instanceof Set) {
+			updateShotDisplay((Set) packet.getLocation());
+		}
 		boardPane.revalidate();
 		boardPane.repaint();
     	break;
@@ -364,7 +424,8 @@ public void render(Packet packet) {
     	showMessage("Money: " + packet.getPlayer().getMoney() + " | Credits: " + packet.getPlayer().getCredits() + " | Rank: " + packet.getPlayer().getRank() + "| Rehearsal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	Set set = (Set) packet.getLocation();
     	showMessage("Shots left:" + set.getShotCount());
-    	
+		updateShotDisplay(set);
+		break;    	
     case REHEARSED:
     	showMessage("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	break;

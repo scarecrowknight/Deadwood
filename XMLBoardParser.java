@@ -100,6 +100,8 @@ public class XMLBoardParser extends XMLParser{
          ArrayList<Role> roles = parseParts(setNode);
          //ivy continue from here and add budget in parser :)
          Set set = new Set(name, b, shotCount, roles);
+
+         set.setTakePositions(takePositions);
          
          b.putRoom(set.getName(), set);
          
