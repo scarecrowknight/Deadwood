@@ -38,12 +38,15 @@ public class GameManager{
     		
     		// Deal Scene Cards to sets
     		for (Room room : board.getAllRooms()) {
-    			if(room instanceof Set) {
+    			if(room instanceof Set && !room.getName().equals("Trailer")) {
     				Set set = (Set) room;
     				Card drawnCard = sceneDeck.draw();
     				if(drawnCard != null) {
     					set.setActiveCard(drawnCard);
     					// set.resetShotCounters();
+                        Packet dealPacket = new Packet(null, set, board, null, Packet.EventType.SCENE_DEALT);
+                        dealPacket.setCardData(drawnCard);
+                        view.render(dealPacket);
     				}
     			}
     		}

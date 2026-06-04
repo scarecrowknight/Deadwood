@@ -21,6 +21,7 @@ public class GuiView{
 	private JPanel bottomWrapperPanel;
 	private JPanel radioPanel;
 	private ButtonGroup currentRadioGroup;
+	private Map<Room, JLabel> activeSceneIcons = new HashMap<>();
 
 	//tracking user input	
 	private volatile String stringResponse = null;
@@ -285,6 +286,30 @@ public void printAvailableRoles(Set destination) {
         showMessage("  (No roles currently available here)");
     }
 }
+private JLabel createCardLabel(Card card, Room room){
+	JLabel cardLabel = new JLabel();
+
+	//Scale Coordinats
+	int x = (int) Math.round(room.getArea().getXPos() * boardScaleX);
+	int y = (int) Math.round(room.getArea().getYPos() * boardScaleY);
+	int width = (int) Math.round(room.getArea().width * boardScaleX);
+	int height = (int) Math.round(room.getArea().height * boardScaleY);
+
+	cardLabel.setBounds(x, y, width, height);
+	ImageIcon originalIcon = new ImageIcon("Images/" + card.getImgFileName());
+	if(originalIcon.getIconWidth() > 0 && originalIcon.getIconHeight() > 0) {
+		Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+		cardLabel.setIcon(new ImageIcon(scaledImage));
+	} else {
+		cardLabel.setText(card.getName());
+		cardLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		cardLabel.setVerticalAlignment(SwingConstants.CENTER);
+		cardLabel.setOpaque(true);
+		cardLabel.setBackground(new Color(255, 255, 255, 200));
+		cardLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+	}
+	return cardLabel;
+}
 public void render(Packet packet) {
     if (packet.getLastEvent() == null) return;
     
@@ -303,7 +328,14 @@ public void render(Packet packet) {
     	showMessage("Current player: " + packet.getPlayer().getName());
     	showMessage("Location: " + packet.getLocation().getName());
         showMessage("Money: " + packet.getPlayer().getMoney() + ", Credits: " + packet.getPlayer().getCredits() + ", Rank: " + packet.getPlayer().getRank());
-    	break; 	
+    	break; 
+	case SCENE_DEALT:
+		JLabel cardLabel = createCardLabel(packet.getCurrentCard(), packet.getLocation());
+		boardPane.add(cardLabel, Integer.valueOf(1));
+		activeSceneIcons.put(packet.getLocation(), cardLabel);
+		boardPane.revalidate();
+		boardPane.repaint();
+    	break;
     case INVALID_ACTION:
     	showMessage("Invalid action... Don't do that again...");
     	break;
@@ -347,6 +379,13 @@ public void render(Packet packet) {
     	break;
     case SCENE_WRAPPED:
     	showMessage("The scene is over and you should leave...");
+
+		JLabel wrappedCard = activeSceneIcons.remove(packet.getLocation());
+		if(wrappedCard != null){
+			boardPane.remove(wrappedCard);
+			boardPane.revalidate();
+			boardPane.repaint();
+		}
     	break;
     case UPGRADED:
     	showMessage("Congrats you got a new rank, you upgraded to " + packet.getPlayer().getRank());
@@ -511,7 +550,7 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             token.setMaximumSize(new Dimension(fixedSize, fixedSize));
             token.setSize(fixedSize, fixedSize);
             playerIcons.put(player, token);
-            boardPane.add(token, Integer.valueOf(1));
+            boardPane.add(token, Integer.valueOf(2));
             Point center = getRoomCenter(location);
             int x = center.x - (fixedSize / 2);
             int y = center.y - (fixedSize / 2);

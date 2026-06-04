@@ -15,7 +15,15 @@ public class Card{
       this. sceneDescription = sceneDescription;
       this. roles = roles;
    }
-   
+   public String getName() {
+      return this.name;
+   }
+   public String getImgFileName() {
+      return this.imgFileName;
+   }
+   public String getSceneDescription() {
+      return this.sceneDescription;
+   }
    public ArrayList<Role> getRoles() {
 	   return this.roles;
    }

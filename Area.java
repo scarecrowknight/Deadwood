@@ -12,17 +12,24 @@ public class Area {
     
     public Area(Node areaNode){
       NamedNodeMap areaMap = areaNode.getAttributes();
-      int[] areaArray = new int[4];
-      for (int i = 0; i < 4; i++) {
-         areaArray[i] = Integer.parseInt( areaMap.item(i).getNodeValue() );
-      }
-      
-      this.height = areaArray[0];
-      this.width = areaArray[1];
-      this.xPos = areaArray[2];
-      this.yPos = areaArray[3];
+
+      this.height = parseAttribute(areaMap, "h", "height");
+      this.width = parseAttribute(areaMap, "w", "width");
+      this.xPos = parseAttribute(areaMap, "x", "xPos");
+      this.yPos =  parseAttribute(areaMap, "y", "yPos");
 
    }
+    private int parseAttribute(NamedNodeMap areaMap, String shortName, String longName) {
+        Node attributeNode = areaMap.getNamedItem(shortName);
+        if (attributeNode == null) {
+            attributeNode = areaMap.getNamedItem(longName);
+        }
+        if (attributeNode != null) {
+            return Integer.parseInt(attributeNode.getNodeValue());
+        } else {
+            throw new IllegalArgumentException("Missing attribute: " + shortName + "/" + longName);
+        }
+    }
 
     public Area(int[] area){
         this.height = area[0];

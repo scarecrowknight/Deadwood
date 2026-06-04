@@ -22,6 +22,7 @@ public class Packet{
         REHEARSED,
         REHEARSAL_MAXED,
         SCENE_WRAPPED,
+        SCENE_DEALT,
         // Upgrade Phase Events
         UPGRADED,
         INVALID_ACTION,
@@ -77,7 +78,9 @@ public class Packet{
         this.allPlayers = allPlayers;
         this.lastEvent = lastEvent;
     }
-    
+    public void setCardData(Card currentCard) {
+    	this.currentCard = currentCard;
+    }
     public void setAllPlayers(List<Player> allPlayers) {
     	this.allPlayers = allPlayers;
     }
