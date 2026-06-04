@@ -1,13 +1,11 @@
 import java.util.*;
 
-public class Room {
+public abstract class Room {
 
    private String name;
    private ArrayList<Room> adjacentRooms;
    private ArrayList<Player> players;
    private Area area;
-
-
 
    public Room(String name, Board board){
       this.name = name;
@@ -17,14 +15,6 @@ public class Room {
 
    public void updateArea(Area area){
       this.area = area;
-   }
-   
-   // alt constructor for if you know adj rooms already
-   // never referenced so far, probably DELETE if it doesnt become useful
-   public Room(String name, ArrayList<Room> adj, Board board){
-      this.name = name;
-      this.adjacentRooms = adj;
-      this.players = new ArrayList<Player>();
    }
    
    public void addAdjacent(Room room){
