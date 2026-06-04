@@ -41,7 +41,7 @@ public class Board {
    }
    //hmm maybe not useful actually
    public void putRoom(String name){
-      Room room = new Room(name, this);
+      Room room = new Set(name, this);
       this.rooms.put(name, room);
    }
    
