@@ -40,6 +40,11 @@ public class GameManager{
     		for (Room room : board.getAllRooms()) {
     			if(room instanceof Set && !room.getName().equals("Trailer")) {
     				Set set = (Set) room;
+
+                    //force gui to clear any old cards from the set before dealing a new one
+                    Packet clearPacket = new Packet(null, set, board, null, Packet.EventType.SCENE_WRAPPED);
+                    view.render(clearPacket);
+                    //draw new card
     				Card drawnCard = sceneDeck.draw();
     				if(drawnCard != null) {
     					set.setActiveCard(drawnCard);
