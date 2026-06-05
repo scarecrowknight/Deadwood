@@ -57,6 +57,12 @@ public class Player{
         this.role = role;
     }
 
+    public void releaseRoomSlot() {
+        if (this.location != null) {
+            this.location.releaseSlot(this);
+        }
+    }
+
     public int getMoney() {
         return money;
     }

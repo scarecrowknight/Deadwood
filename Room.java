@@ -52,6 +52,17 @@ public abstract class Room {
       Integer slot = playerSlotMap.get(player);
       return slot != null ? slot : -1;
    }
+
+   public void releaseSlot(Player player) {
+      if (player == null) {
+         return;
+      }
+      Integer slot = playerSlotMap.remove(player);
+      if (slot != null && slot >= 0 && slot < occupiedSlots.length) {
+         occupiedSlots[slot] = false;
+      }
+   }
+
    private void assignSlot(Player player) {
       if (player == null || playerSlotMap.containsKey(player)) {
          return;

@@ -62,8 +62,9 @@ public class TakeRoleManager {
                 }
                 
                 if(chosenR != null) {
-                	currentPlayer.setRole(chosenR);
-                	chosenR.setOccupied(true);
+                    currentPlayer.releaseRoomSlot();
+                    currentPlayer.setRole(chosenR);
+                    chosenR.setOccupied(true);
                 	//role taken = turn over.
                 	//turnComplete = true;
                 	
