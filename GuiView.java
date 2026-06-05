@@ -3,8 +3,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class GuiView{
-
+public final class GuiView{
+   
+   private static GuiView instance = null;
+   
 	private JLayeredPane boardPane;
 	private JLabel boardLabel;
 	private JTextArea gameLog;
@@ -77,8 +79,18 @@ public class GuiView{
 	//tracking user input	
 	private volatile String stringResponse = null;
 	private volatile Boolean buttonResponse = null;
-
-	public GuiView(){
+   
+   public static GuiView getInstance(){
+      if(GuiView.instance == null){
+         GuiView singleton = new GuiView();
+         instance = singleton;
+         return instance;
+      } else {
+         return instance;
+      }
+   }
+   
+	private GuiView(){
 
 		// Setup game board
 		this.frame = new JFrame("Deadwood");

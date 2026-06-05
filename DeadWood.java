@@ -51,9 +51,9 @@ public class DeadWood {
       //(Model)
     	DeadWood gameSetup = new DeadWood();
     	Board gameBoard = gameSetup.getBoard();
-    
+      
     	//(View)
-    	GuiView gameView = new GuiView();
+    	GuiView gameView = GuiView.getInstance();
     	
     	//(Controller) 
     	boolean playerIsReady = gameView.askStart();
