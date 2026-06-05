@@ -743,7 +743,12 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             return;
         }
 
-        Point center = getAreaCenter(roleArea);
+        Point center;
+        if (role.getStarringRole() && player.currentLocation() instanceof Set) {
+            center = getCardRoleCenter((Set) player.currentLocation(), role);
+        } else {
+            center = getAreaCenter(roleArea);
+        }
         int size = token.getWidth();
         int targetX = center.x - (size / 2);
         int targetY = center.y - (size / 2);
@@ -813,6 +818,28 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
         return new Point(centerX, centerY);
     }
 
+    private Point getCardRoleCenter(Set set, Role role) {
+        if (set == null || role == null || role.getArea() == null) {
+            return getAreaCenter(role != null ? role.getArea() : null);
+        }
+
+        Card card = set.getActiveCard();
+        if (card == null) {
+            return getAreaCenter(role.getArea());
+        }
+
+        ImageIcon cardIcon = new ImageIcon("Images/" + card.getImgFileName());
+        double cardWidth = Math.max(cardIcon.getIconWidth(), 1.0);
+        double cardHeight = Math.max(cardIcon.getIconHeight(), 1.0);
+        double scaleX = set.getArea().getWidth() / cardWidth;
+        double scaleY = set.getArea().getHeight() / cardHeight;
+
+        Area roleArea = role.getArea();
+        int centerX = (int) Math.round((set.getArea().getXPos() + roleArea.getXPos() * scaleX + roleArea.getWidth() / 2.0 * scaleX) * boardScaleX);
+        int centerY = (int) Math.round((set.getArea().getYPos() + roleArea.getYPos() * scaleY + roleArea.getHeight() / 2.0 * scaleY) * boardScaleY);
+        return new Point(centerX, centerY);
+    }
+
     private Point getRoomCenter(Room room) {
         if (room == null) {
             return new Point(0, 0);
@@ -825,11 +852,10 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             return getRoomCenter(room);
         }
 
-        int slotIndex = 0;
-        if (room.getPlayers() != null && room.getPlayers().contains(player)) {
-            slotIndex = room.getPlayers().indexOf(player);
+        int slotIndex = room.getSlotFor(player);
+        if (slotIndex < 0) {
+            slotIndex = 0;
         }
-
         slotIndex = Math.max(0, Math.min(slotIndex, 7));
         int column = slotIndex % 4;
         int row = slotIndex / 4;
