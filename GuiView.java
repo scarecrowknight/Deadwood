@@ -24,7 +24,16 @@ public final class GuiView{
 	private JPanel radioPanel;
 	private ButtonGroup currentRadioGroup;
 	private Map<String, JLabel> activeSceneIcons = new HashMap<>();
+	private Map<String, Room> activeSceneRooms = new HashMap<>();
 	private Map<Room, List<JLabel>> activeShotIcons = new HashMap<>();
+	private Map<String, String> activeSceneImagePaths = new HashMap<>();
+	private JPanel sidePanel;
+	private JScrollPane logScrollPane;
+	private static final int MIN_LOG_PANEL_WIDTH = 300;
+	private static final int MAX_LOG_PANEL_WIDTH = 500;
+	private Image rawBoardImage;
+	private int rawBoardWidth;
+	private int rawBoardHeight;
 
 	public void updateShotDisplay(Set set){
 		if (activeShotIcons.containsKey(set)) {
@@ -101,28 +110,16 @@ public final class GuiView{
 		
 		this.boardPane = new JLayeredPane();
 		ImageIcon gameBoardImage = new ImageIcon("Images/board.jpg");
+		this.rawBoardImage = gameBoardImage.getImage();
+		this.rawBoardWidth = this.rawBoardImage.getWidth(null);
+		this.rawBoardHeight = this.rawBoardImage.getHeight(null);
 
-	// Keep room coordinates aligned with the board image, even if scaled.
-	Image rawBoardImage = gameBoardImage.getImage();
-	int rawWidth = rawBoardImage.getWidth(null);
-	int rawHeight = rawBoardImage.getHeight(null);
-	if (rawWidth > 0 && rawHeight > 0) {
-		boardScaleX = 800.0 / rawWidth;
-		boardScaleY = 600.0 / rawHeight;
-	}
-
-	// Making the window smaller and scaling the board image to fit.
-	Image scaledImage = rawBoardImage.getScaledInstance(800, 600, Image.SCALE_SMOOTH);
-	gameBoardImage = new ImageIcon(scaledImage);
-	this.boardLabel = new JLabel(gameBoardImage);
-
-		//set size of the board
-		int width = gameBoardImage.getIconWidth();
-		int height = gameBoardImage.getIconHeight();
+		this.boardLabel = new JLabel();
+		applyBoardScale();
 
 		// Size of the board pane and position the board label
-		this.boardPane.setPreferredSize(new Dimension(width, height));
-		this.boardLabel.setBounds(0, 0, width, height);
+		this.boardPane.setPreferredSize(new Dimension(this.boardLabel.getWidth(), this.boardLabel.getHeight()));
+		this.boardLabel.setBounds(0, 0, this.boardLabel.getWidth(), this.boardLabel.getHeight());
 		this.boardLabel.setLocation(0, 0);
 
 		// Add the board label to the layered pane
@@ -136,13 +133,15 @@ public final class GuiView{
 		this.gameLog.setWrapStyleWord(true);
 
 		// Wrap the game log in a scroll pane
-		JScrollPane scrollPane = new JScrollPane(this.gameLog);
+		this.logScrollPane = new JScrollPane(this.gameLog);
 
 		//Side panel to hold game log and action panel
-		JPanel sidePanel = new JPanel(new BorderLayout());
-		sidePanel.add(new JLabel(""), BorderLayout.NORTH);
-		sidePanel.add(scrollPane, BorderLayout.CENTER);
-		sidePanel.setPreferredSize(new Dimension(300,10));
+		this.sidePanel = new JPanel(new BorderLayout());
+		this.sidePanel.add(new JLabel(""), BorderLayout.NORTH);
+		this.sidePanel.add(this.logScrollPane, BorderLayout.CENTER);
+		this.sidePanel.setPreferredSize(new Dimension(MIN_LOG_PANEL_WIDTH, 10));
+		this.sidePanel.setMinimumSize(new Dimension(MIN_LOG_PANEL_WIDTH, 0));
+		this.sidePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
 		// Action panel for prompts and buttons
 		this.actionPanel = new JPanel();
@@ -152,28 +151,36 @@ public final class GuiView{
 
 		this.actionPanel.add(this.promptLabel);
 		this.actionPanel.add(this.buttonPanel);
-		sidePanel.add(this.actionPanel, BorderLayout.SOUTH);
-		this.frame.add(sidePanel, BorderLayout.EAST);
+		this.frame.add(this.sidePanel, BorderLayout.EAST);
 		
 		//make sure prompts, action buttons, and text are not cut off
 		this.buttonPanel.setPreferredSize(new Dimension(280, 120));
 
-		// add some padding around action panel
-		this.actionPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
+		// add some padding around action panel while keeping the button area tight to the radio buttons
+		this.actionPanel.setBorder(BorderFactory.createEmptyBorder(2, 10, 8, 10));
 		
 		// Radio buttons for current player display
 		this.radioPanel = new JPanel(new FlowLayout());
-		this.radioPanel.setBorder(BorderFactory.createEmptyBorder(30, 10, 30, 10));
+		this.radioPanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 4, 10));
 
 		// Wrapper panel to hold both radio buttons and action buttons
 		this.bottomWrapperPanel = new JPanel();
+		this.bottomWrapperPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		this.bottomWrapperPanel.setLayout(new BoxLayout(this.bottomWrapperPanel, BoxLayout.Y_AXIS));
 		this.bottomWrapperPanel.add(this.radioPanel);
 		this.bottomWrapperPanel.add(this.actionPanel);
-		sidePanel.add(this.bottomWrapperPanel, BorderLayout.SOUTH);
+		this.sidePanel.add(this.bottomWrapperPanel, BorderLayout.SOUTH);
+
+		this.frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+			@Override
+			public void componentResized(java.awt.event.ComponentEvent e) {
+				applyBoardScale();
+			}
+		});
 
 		//finalize...
 		this.frame.pack();
+		this.frame.setMinimumSize(new Dimension(900, 700));
 		this.frame.setLocationRelativeTo(null);
 		this.frame.setVisible(true);
 
@@ -257,6 +264,216 @@ public final class GuiView{
 	public void showMessage(String message) {
 		this.gameLog.append(message + "\n");
 		this.gameLog.setCaretPosition(this.gameLog.getDocument().getLength());
+	}
+
+	private double getPlayerTokenScaleFactor() {
+		return 0.5 + 0.5 * Math.min(this.boardScaleX, this.boardScaleY);
+	}
+
+	private int getPlayerTokenSize() {
+		return Math.max(24, (int) Math.round(40.0 * getPlayerTokenScaleFactor()));
+	}
+
+	private String[] wrapPlayerLabelLines(JLabel token, String rawName, int tokenSize, Font font) {
+		if (rawName == null || rawName.trim().isEmpty()) {
+			return new String[] { "" };
+		}
+		String text = rawName.trim().replaceAll("\\s+", " ");
+		String[] words = text.split(" ");
+		List<String> lines = new ArrayList<>();
+		StringBuilder currentLine = new StringBuilder();
+		FontMetrics fm = token.getFontMetrics(font);
+		for (String word : words) {
+			String candidate = currentLine.length() == 0 ? word : currentLine + " " + word;
+			if (fm.stringWidth(candidate) <= Math.max(18, tokenSize - 8)) {
+				currentLine = new StringBuilder(candidate);
+			} else {
+				if (currentLine.length() > 0) {
+					lines.add(currentLine.toString());
+				}
+				currentLine = new StringBuilder(word);
+			}
+		}
+		if (currentLine.length() > 0) {
+			lines.add(currentLine.toString());
+		}
+		return lines.toArray(new String[0]);
+	}
+
+	private String buildWrappedLabelHtml(String[] lines) {
+		if (lines == null || lines.length == 0) {
+			return "";
+		}
+		StringBuilder html = new StringBuilder("<html><div style='text-align:center; line-height:95%;'>");
+		for (int i = 0; i < lines.length; i++) {
+			if (i > 0) {
+				html.append("<br>");
+			}
+			html.append(lines[i]);
+		}
+		html.append("</div></html>");
+		return html.toString();
+	}
+
+	private float getPlayerTokenFontSize(int tokenSize) {
+		return Math.max(12f, 30f * (tokenSize / 40.0f));
+	}
+
+	private void refreshPlayerTokenAppearance(JLabel token, Player player, int tokenSize) {
+		if (token == null || player == null) {
+			return;
+		}
+
+		String rawName = player.getName();
+		if (rawName == null) {
+			rawName = "";
+		}
+		rawName = rawName.trim().replaceAll("\\s+", " ");
+		if (rawName.length() > 14) {
+			rawName = rawName.substring(0, 14).trim();
+		}
+
+		float fontSize = getPlayerTokenFontSize(tokenSize);
+		Font font = token.getFont().deriveFont(Font.BOLD, fontSize);
+		token.setFont(font);
+
+		String[] lines = wrapPlayerLabelLines(token, rawName, tokenSize, font);
+		int padding = 2;
+		while (true) {
+			FontMetrics fm = token.getFontMetrics(font);
+			int maxLineWidth = 0;
+			for (String line : lines) {
+				maxLineWidth = Math.max(maxLineWidth, fm.stringWidth(line));
+			}
+			int totalHeight = fm.getHeight() * Math.max(lines.length, 1);
+			if (maxLineWidth + padding * 2 <= tokenSize && totalHeight + padding * 2 <= tokenSize) {
+				break;
+			}
+			if (fontSize <= 10f) {
+				break;
+			}
+			fontSize -= 0.5f;
+			font = token.getFont().deriveFont(Font.BOLD, fontSize);
+			token.setFont(font);
+			lines = wrapPlayerLabelLines(token, rawName, tokenSize, font);
+		}
+
+		token.setText(buildWrappedLabelHtml(lines));
+		if (lines.length == 1 && lines[0].isEmpty()) {
+			token.setText(rawName);
+		}
+	}
+
+	private void applyBoardScale() {
+		if (this.rawBoardImage == null || this.rawBoardWidth <= 0 || this.rawBoardHeight <= 0) {
+			return;
+		}
+
+		int availableWidth = Math.max(800, this.frame.getContentPane().getWidth() - 320);
+		int availableHeight = Math.max(600, this.frame.getContentPane().getHeight() - 40);
+		double scale = Math.min(availableWidth / (double) this.rawBoardWidth,
+						 availableHeight / (double) this.rawBoardHeight);
+		if (scale <= 0) {
+			scale = 1.0;
+		}
+
+		this.boardScaleX = scale;
+		this.boardScaleY = scale;
+
+		int scaledWidth = (int) Math.round(this.rawBoardWidth * scale);
+		int scaledHeight = (int) Math.round(this.rawBoardHeight * scale);
+		Image scaledImage = this.rawBoardImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+		this.boardLabel.setIcon(new ImageIcon(scaledImage));
+		this.boardLabel.setBounds(0, 0, scaledWidth, scaledHeight);
+		this.boardPane.setPreferredSize(new Dimension(scaledWidth, scaledHeight));
+
+		int availableExtraWidth = Math.max(0, this.frame.getWidth() - scaledWidth - 40);
+		int targetLogWidth = Math.max(MIN_LOG_PANEL_WIDTH, availableExtraWidth);
+		if (this.sidePanel != null) {
+			this.sidePanel.setPreferredSize(new Dimension(targetLogWidth, this.sidePanel.getHeight()));
+			this.sidePanel.setMinimumSize(new Dimension(MIN_LOG_PANEL_WIDTH, 0));
+			this.sidePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+		}
+
+		this.frame.revalidate();
+		this.frame.repaint();
+		this.boardPane.revalidate();
+		this.boardPane.repaint();
+
+		for (Map.Entry<String, JLabel> entry : this.activeSceneIcons.entrySet()) {
+			Room room = this.activeSceneRooms.get(entry.getKey());
+			if (room != null) {
+				int x = (int) Math.round(room.getArea().getXPos() * this.boardScaleX);
+				int y = (int) Math.round(room.getArea().getYPos() * this.boardScaleY);
+				int w = (int) Math.round(room.getArea().getWidth() * this.boardScaleX);
+				int h = (int) Math.round(room.getArea().getHeight() * this.boardScaleY);
+				entry.getValue().setBounds(x, y, w, h);
+				String imagePath = this.activeSceneImagePaths.get(entry.getKey());
+				if (imagePath != null && !imagePath.isEmpty()) {
+					ImageIcon originalIcon = new ImageIcon(imagePath);
+					if (originalIcon.getIconWidth() > 0 && originalIcon.getIconHeight() > 0) {
+						Image refreshedImage = originalIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+						entry.getValue().setIcon(new ImageIcon(refreshedImage));
+					}
+				} else if (entry.getValue().getIcon() instanceof ImageIcon) {
+					ImageIcon currentIcon = (ImageIcon) entry.getValue().getIcon();
+					Image refreshedImage = currentIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+					entry.getValue().setIcon(new ImageIcon(refreshedImage));
+				}
+			}
+		}
+
+		for (Map.Entry<Room, List<JLabel>> entry : this.activeShotIcons.entrySet()) {
+			Room room = entry.getKey();
+			if (room == null || room.getArea() == null) {
+				continue;
+			}
+			ArrayList<Area> positions = ((Set) room).getTakePositions();
+			if (positions == null) {
+				continue;
+			}
+			for (int i = 0; i < entry.getValue().size() && i < positions.size(); i++) {
+				Area area = positions.get(i);
+				JLabel icon = entry.getValue().get(i);
+				int x = (int) Math.round(area.getXPos() * this.boardScaleX);
+				int y = (int) Math.round(area.getYPos() * this.boardScaleY);
+				int w = (int) Math.round(area.getWidth() * this.boardScaleX);
+				int h = (int) Math.round(area.getHeight() * this.boardScaleY);
+				icon.setBounds(x, y, w, h);
+				if (icon.getIcon() instanceof ImageIcon) {
+					ImageIcon currentIcon = (ImageIcon) icon.getIcon();
+					Image refreshedImage = currentIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+					icon.setIcon(new ImageIcon(refreshedImage));
+				}
+			}
+		}
+
+		for (Map.Entry<Player, JLabel> entry : this.playerIcons.entrySet()) {
+			Player player = entry.getKey();
+			JLabel token = entry.getValue();
+			int tokenSize = getPlayerTokenSize();
+			token.setPreferredSize(new Dimension(tokenSize, tokenSize));
+			token.setMinimumSize(new Dimension(tokenSize, tokenSize));
+			token.setMaximumSize(new Dimension(tokenSize, tokenSize));
+			token.setSize(tokenSize, tokenSize);
+			refreshPlayerTokenAppearance(token, player, tokenSize);
+
+			Object anchoredRole = token.getClientProperty("anchoredRole");
+			if (anchoredRole instanceof Role) {
+				Role role = (Role) anchoredRole;
+				Point center = role.getStarringRole() && player.currentLocation() instanceof Set
+						? getCardRoleCenter((Set) player.currentLocation(), role)
+						: getAreaCenter(role.getArea());
+				token.setLocation(center.x - (tokenSize / 2), center.y - (tokenSize / 2));
+				continue;
+			}
+
+			Room currentRoom = player.currentLocation();
+			if (currentRoom != null) {
+				Point center = getRoomSlotCenter(currentRoom, player);
+				token.setLocation(center.x - (tokenSize / 2), center.y - (tokenSize / 2));
+			}
+		}
 	}
 
 	public void refreshActionPanel() {
@@ -400,6 +617,8 @@ public void render(Packet packet) {
 		JLabel cardLabel = createCardLabel(packet.getCurrentCard(), packet.getLocation(), false);
 		boardPane.add(cardLabel, Integer.valueOf(1));
 		activeSceneIcons.put(packet.getLocation().getName(), cardLabel);
+		activeSceneRooms.put(packet.getLocation().getName(), packet.getLocation());
+		activeSceneImagePaths.put(packet.getLocation().getName(), "Images/Cardback.png");
 		if(packet.getLocation() instanceof Set) {
 			updateShotDisplay((Set) packet.getLocation());
 		}
@@ -447,6 +666,7 @@ public void render(Packet packet) {
 			ImageIcon originalIcon = new ImageIcon("Images/" + card.getImgFileName());
 			Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
 			revealedCardLabel.setIcon(new ImageIcon(scaledImage));
+			activeSceneImagePaths.put(room.getName(), "Images/" + card.getImgFileName());
 			//force gui to update 
 			boardPane.moveToFront(revealedCardLabel);
 			boardPane.revalidate();
@@ -477,6 +697,8 @@ public void render(Packet packet) {
     	showMessage("The scene is over and you should leave...");
 		
 		JLabel wrappedCard = activeSceneIcons.remove(packet.getLocation().getName());
+		activeSceneRooms.remove(packet.getLocation().getName());
+		activeSceneImagePaths.remove(packet.getLocation().getName());
 		if(wrappedCard != null){
 			boardPane.remove(wrappedCard);
 			boardPane.revalidate();
@@ -486,6 +708,8 @@ public void render(Packet packet) {
 		
 	 case SCENE_RESET:
 		JLabel resetCard = activeSceneIcons.remove(packet.getLocation().getName());
+		activeSceneRooms.remove(packet.getLocation().getName());
+		activeSceneImagePaths.remove(packet.getLocation().getName());
 		if(resetCard != null){
 			boardPane.remove(resetCard);
 			boardPane.revalidate();
@@ -605,20 +829,7 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
                 rawName = rawName.substring(0, 14).trim();
             }
 
-            String labelText;
-            String[] lines;
-            if (rawName.contains(" ")) {
-                int splitIndex = rawName.indexOf(' ');
-                String firstLine = rawName.substring(0, splitIndex);
-                String secondLine = rawName.substring(splitIndex + 1);
-                lines = new String[] { firstLine, secondLine };
-                labelText = "<html><div style='text-align:center; margin:0px; padding:0px;'>" + firstLine + "<br>" + secondLine + "</div></html>";
-            } else {
-                lines = new String[] { rawName };
-                labelText = rawName;
-            }
-
-            JLabel token = new JLabel(labelText, SwingConstants.CENTER);
+            JLabel token = new JLabel("", SwingConstants.CENTER);
             token.setOpaque(true);
             token.setForeground(Color.WHITE);
             token.setBackground(getPlayerColor(player.getUserNumber()));
@@ -626,29 +837,8 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             token.setHorizontalAlignment(SwingConstants.CENTER);
             token.setVerticalAlignment(SwingConstants.CENTER);
 
-            int fixedSize = 40;
-            float fontSize = 30f;
-            Font font = token.getFont().deriveFont(Font.BOLD, fontSize);
-            token.setFont(font);
-
-            int padding = 2;
-            FontMetrics fm = token.getFontMetrics(font);
-            int maxLineWidth = 0;
-            for (String line : lines) {
-                maxLineWidth = Math.max(maxLineWidth, fm.stringWidth(line));
-            }
-            int totalHeight = fm.getHeight() * lines.length;
-            while (maxLineWidth + padding * 2 > fixedSize || totalHeight + padding * 2 > fixedSize) {
-                fontSize -= 0.5f;
-                font = font.deriveFont(Font.BOLD, fontSize);
-                token.setFont(font);
-                fm = token.getFontMetrics(font);
-                maxLineWidth = 0;
-                for (String line : lines) {
-                    maxLineWidth = Math.max(maxLineWidth, fm.stringWidth(line));
-                }
-                totalHeight = fm.getHeight() * lines.length;
-            }
+            int fixedSize = getPlayerTokenSize();
+            refreshPlayerTokenAppearance(token, player, fixedSize);
 
             token.setPreferredSize(new Dimension(fixedSize, fixedSize));
             token.setMinimumSize(new Dimension(fixedSize, fixedSize));
@@ -736,6 +926,7 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
         }
 
         Area roleArea = role.getArea();
+        token.putClientProperty("anchoredRole", role);
         if (roleArea == null) {
             if (player.currentLocation() != null) {
                 movePlayerIcon(player, player.currentLocation());
@@ -760,6 +951,7 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
         if (token == null || location == null) {
             return;
         }
+        token.putClientProperty("anchoredRole", null);
         Point center = getRoomSlotCenter(location, player);
         int size = token.getWidth();
         int targetX = center.x - (size / 2);
