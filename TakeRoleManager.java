@@ -9,7 +9,7 @@ public class TakeRoleManager {
         this.board = board;
         this.view = view;
     }
-    public void TakeRole(Player currentPlayer) {
+    public boolean TakeRole(Player currentPlayer) {
                 // take role: Scans current set of unoccupied off card and on card roles. Filters
             	//            out roles player cant take. If a valid role is picked,
             	//            role is assigned to player, marked occupied, and turn ends
@@ -38,7 +38,7 @@ public class TakeRoleManager {
                 //if no roles for players current rank
                 if(availableRoles.isEmpty()) {
                 	view.showMessage("Your rank is too low for that.");
-                	return;
+                	return false;
                 }
                 
                 roleNames.add("Cancel");
@@ -48,7 +48,7 @@ public class TakeRoleManager {
                 String roleChoice = view.renderAndRequestAction(roleQuery);
                 
                 if(roleChoice.equalsIgnoreCase("cancel")) {
-                	return;
+                	return false;
                 }
                 
                 //find the role they typed
@@ -70,9 +70,11 @@ public class TakeRoleManager {
                 	Packet tookRole = new Packet(currentPlayer, loc, board, null, Packet.EventType.TOOK_ROLE);
                 	tookRole.setRoleData(chosenR);
                 	view.render(tookRole);
+                    return true;
                 } else {
                 	Packet invalid = new Packet(currentPlayer, loc, board, null, Packet.EventType.INVALID_ACTION);
                 	view.render(invalid);
+                    return false;
                 }
             }
         }

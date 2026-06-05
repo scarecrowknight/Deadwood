@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class Board {
-   private Room trailer;
+   private Trailer trailer;
    //always an array of size 12 with a casting office and a trailer   
    private HashMap<String, Room> rooms;
    
@@ -11,7 +11,7 @@ public class Board {
    public Collection<Room> getAllRooms(){
 	   return this.rooms.values();
    }
-   public void setTrailer(Room trailer){
+   public void setTrailer(Trailer trailer){
       this.trailer = trailer;
    }
    
@@ -38,11 +38,6 @@ public class Board {
 		   }
 	   }
 	   return count;
-   }
-   //hmm maybe not useful actually
-   public void putRoom(String name){
-      Room room = new Set(name, this);
-      this.rooms.put(name, room);
    }
    
    public void addEdge(Room room1, Room room2){

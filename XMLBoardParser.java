@@ -33,7 +33,7 @@ public class XMLBoardParser extends XMLParser{
    private void parseTrailer(NodeList trailerNodeList, Board b){
       Node trailerNode = trailerNodeList.item(0);
       String name = "Trailer";
-      Room trailer = new Set(name, b);
+      Trailer trailer = new Trailer(name, b);
       b.putRoom(trailer.getName(), trailer);
       b.setTrailer(trailer);
       

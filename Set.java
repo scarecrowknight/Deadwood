@@ -15,10 +15,7 @@ public class Set extends Room {
 	   this.currentPlayers = new ArrayList<Player>(); //list of current players on set
 	   this.roles = roles; //containes the the "static roles" to be appended by parser
    }
-   public Set(String name, Board board) {
-	   super(name, board);
-	   this.currentPlayers = new ArrayList<Player>(); //list of current players on set
-   }
+
 	public void setTakePositions(ArrayList<Area> takePositions) {this.takePositions = takePositions;}
 	public ArrayList<Area> getTakePositions() {return this.takePositions;}
 

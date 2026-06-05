@@ -150,8 +150,10 @@ public class GameManager{
                 hasMoved = true;           
             } else if (action.equals("take role") && currentPlayer.getRole() == null) {
             	TakeRoleManager takeRoleManager = new TakeRoleManager(board, view);
-                takeRoleManager.TakeRole(currentPlayer);
-                hasMoved = true; // Taking a role consumes the move action, but not the whole turn (player can still work if they take a role)
+                if(takeRoleManager.TakeRole(currentPlayer)){
+                    // Taking a role consumes the move action if a role is successfully taken, but not the whole turn (player can still work if they take a role)
+                    hasMoved = true;
+                }
             } else if (action.equals("work") && currentPlayer.getRole() != null) {
                 WorkManager work = new WorkManager(board, view, players);
                 work.work(currentPlayer);
