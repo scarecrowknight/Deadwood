@@ -459,10 +459,19 @@ public void render(Packet packet) {
     	break;
     case SCENE_WRAPPED:
     	showMessage("The scene is over and you should leave...");
-
+		
 		JLabel wrappedCard = activeSceneIcons.remove(packet.getLocation().getName());
 		if(wrappedCard != null){
 			boardPane.remove(wrappedCard);
+			boardPane.revalidate();
+			boardPane.repaint();
+		}
+    	break;
+		
+	 case SCENE_RESET:
+		JLabel resetCard = activeSceneIcons.remove(packet.getLocation().getName());
+		if(resetCard != null){
+			boardPane.remove(resetCard);
 			boardPane.revalidate();
 			boardPane.repaint();
 		}

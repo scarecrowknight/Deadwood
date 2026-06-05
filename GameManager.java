@@ -42,7 +42,7 @@ public class GameManager{
     				Set set = (Set) room;
 
                     //force gui to clear any old cards from the set before dealing a new one
-                    Packet clearPacket = new Packet(null, set, board, null, Packet.EventType.SCENE_WRAPPED);
+                    Packet clearPacket = new Packet(null, set, board, null, Packet.EventType.SCENE_RESET);
                     view.render(clearPacket);
                     //draw new card
     				Card drawnCard = sceneDeck.draw();

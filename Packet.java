@@ -22,6 +22,7 @@ public class Packet{
         REHEARSED,
         REHEARSAL_MAXED,
         SCENE_WRAPPED,
+        SCENE_RESET,
         SCENE_DEALT,
         // Upgrade Phase Events
         UPGRADED,

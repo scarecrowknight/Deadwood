@@ -171,6 +171,8 @@ public void render(Packet packet) {
     case QUERY_WORK:
     	System.out.println("rehersal credits: " + packet.getPlayer().getPracticeChips() + "\n");
     	break;
+    case SCENE_RESET:
+    	break;
     case SCENE_WRAPPED:
     	System.out.println("The scene is over and you should leave...");
     	break;
