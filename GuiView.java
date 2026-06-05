@@ -43,7 +43,7 @@ public class GuiView{
 			}
 			Area takeArea = takePositions.get(i);
 
-			//scales the xml coords to match window
+			// Use the same board-label coordinate mapping as the player tokens.
 			int x = (int) Math.round(takeArea.getXPos() * boardScaleX);
 			int y = (int) Math.round(takeArea.getYPos() * boardScaleY);
 			int width = (int) Math.round(takeArea.getWidth() * boardScaleX);
@@ -110,10 +110,8 @@ public class GuiView{
 
 		// Size of the board pane and position the board label
 		this.boardPane.setPreferredSize(new Dimension(width, height));
-		this.boardLabel.setBounds(0, 0, width + 100, height + 50);
-		
-		// Shift the board label to the left and up to make room for the side panel
-		this.boardLabel.setLocation(-50, -25);
+		this.boardLabel.setBounds(0, 0, width, height);
+		this.boardLabel.setLocation(0, 0);
 
 		// Add the board label to the layered pane
 		this.boardPane.add(boardLabel, Integer.valueOf(0)); // Add board to the lowest layer
@@ -340,7 +338,7 @@ public void printAvailableRoles(Set destination) {
 
 private JLabel createCardLabel(Card card, Room room, boolean isRevealed) {
 	JLabel cardLabel = new JLabel();
-	//Scale Coordinats
+	// Use the same board-label coordinate mapping as the player tokens.
 	int x = (int) Math.round(room.getArea().getXPos() * boardScaleX);
 	int y = (int) Math.round(room.getArea().getYPos() * boardScaleY);
 	int width = (int) Math.round(room.getArea().width * boardScaleX);
@@ -396,6 +394,12 @@ public void render(Packet packet) {
 		boardPane.revalidate();
 		boardPane.repaint();
     	break;
+    case TOOK_ROLE:
+        if (packet.getPlayer() != null && packet.getTargetRole() != null) {
+            movePlayerToRole(packet.getPlayer(), packet.getTargetRole());
+            showMessage(packet.getPlayer().getName() + " took role: " + packet.getTargetRole().getName());
+        }
+        break;
     case INVALID_ACTION:
     	showMessage("Invalid action... Don't do that again...");
     	break;
@@ -640,7 +644,7 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
             token.setSize(fixedSize, fixedSize);
             playerIcons.put(player, token);
             boardPane.add(token, Integer.valueOf(2));
-            Point center = getRoomCenter(location);
+            Point center = getRoomSlotCenter(location, player);
             int x = center.x - (fixedSize / 2);
             int y = center.y - (fixedSize / 2);
             token.setLocation(x, y);
@@ -706,12 +710,40 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
         return path;
     }
 */
+    public void movePlayerToRole(Player player, Role role) {
+        if (player == null || role == null) {
+            return;
+        }
+        if (!playerIcons.containsKey(player)) {
+            registerPlayerIcon(player, player.currentLocation());
+        }
+
+        JLabel token = playerIcons.get(player);
+        if (token == null) {
+            return;
+        }
+
+        Area roleArea = role.getArea();
+        if (roleArea == null) {
+            if (player.currentLocation() != null) {
+                movePlayerIcon(player, player.currentLocation());
+            }
+            return;
+        }
+
+        Point center = getAreaCenter(roleArea);
+        int size = token.getWidth();
+        int targetX = center.x - (size / 2);
+        int targetY = center.y - (size / 2);
+        SwingUtilities.invokeLater(() -> animateTokenTo(token, targetX, targetY));
+    }
+
     private void movePlayerIcon(Player player, Room location) {
         JLabel token = playerIcons.get(player);
         if (token == null || location == null) {
             return;
         }
-        Point center = getRoomCenter(location);
+        Point center = getRoomSlotCenter(location, player);
         int size = token.getWidth();
         int targetX = center.x - (size / 2);
         int targetY = center.y - (size / 2);
@@ -760,14 +792,42 @@ public void updatePlayerDisplay(String currentPlayerName, List<String> playerNam
         timer.start();
     }
 
-    private Point getRoomCenter(Room room) {
-        if (room == null || room.getArea() == null) {
+    private Point getAreaCenter(Area area) {
+        if (area == null) {
             return new Point(0, 0);
         }
-        Area area = room.getArea();
         int centerX = (int) Math.round((area.getXPos() + (area.getWidth() / 2.0)) * boardScaleX);
         int centerY = (int) Math.round((area.getYPos() + (area.getHeight() / 2.0)) * boardScaleY);
-        return new Point(centerX + boardLabel.getX(), centerY + boardLabel.getY());
+        return new Point(centerX, centerY);
+    }
+
+    private Point getRoomCenter(Room room) {
+        if (room == null) {
+            return new Point(0, 0);
+        }
+        return getAreaCenter(room.getArea());
+    }
+
+    private Point getRoomSlotCenter(Room room, Player player) {
+        if (room == null || room.getArea() == null) {
+            return getRoomCenter(room);
+        }
+
+        int slotIndex = 0;
+        if (room.getPlayers() != null && room.getPlayers().contains(player)) {
+            slotIndex = room.getPlayers().indexOf(player);
+        }
+
+        slotIndex = Math.max(0, Math.min(slotIndex, 7));
+        int column = slotIndex % 4;
+        int row = slotIndex / 4;
+
+        Area area = room.getArea();
+        double cellWidth = area.getWidth() / 4.0;
+        double cellHeight = area.getHeight() / 2.0;
+        int centerX = (int) Math.round((area.getXPos() + (column + 0.5) * cellWidth) * boardScaleX);
+        int centerY = (int) Math.round((area.getYPos() + (row + 0.5) * cellHeight) * boardScaleY);
+        return new Point(centerX, centerY);
     }
 
     private Color getPlayerColor(int playerNumber) {
