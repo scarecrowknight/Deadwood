@@ -140,7 +140,7 @@ public final class GuiView{
 
 		//Side panel to hold game log and action panel
 		JPanel sidePanel = new JPanel(new BorderLayout());
-		sidePanel.add(new JLabel("Game Log"), BorderLayout.NORTH);
+		sidePanel.add(new JLabel(""), BorderLayout.NORTH);
 		sidePanel.add(scrollPane, BorderLayout.CENTER);
 		sidePanel.setPreferredSize(new Dimension(300,10));
 
